@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}My Account | Library Loan System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg p-4 w-75">
+        <div class="text-center mb-4">
+            <!-- Profile Avatar Placeholder -->
+            <div class="profile-avatar mx-auto mb-3">
+                <i class="fas fa-user-circle fa-5x text-secondary"></i>
+            </div>
+            <h2 class="fw-bold">Welcome, {{ user.get_first_name() }}!</h2>
+            <p class="text-muted">Manage your account details below.</p>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <h5 class="fw-bold">Account Information</h5>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Email:</strong> {{ user.get_email() }}</li>
+                    <li class="list-group-item"><strong>First Name:</strong> {{ user.get_first_name() }}</li>
+                    <li class="list-group-item"><strong>Last Name:</strong> {{ user.get_last_name() }}</li>
+                    <li class="list-group-item"><strong>Contact Number:</strong> {{ user.get_contact_number() }}</li>
+                    <li class="list-group-item"><strong>Address:</strong> {{ user.get_address() }}</li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark px-4">Logout</a>
+
+                {% if user.get_user_id() != "GoogleUser" %}
+                    <a href="{{ url_for('update_user', id=user.get_user_id()) }}" class="btn btn-primary px-4 ms-2">Update Information</a>
+
+                    <!-- Delete Account Button (Triggers Modal) -->
+                    <button type="button" class="btn btn-danger px-4 ms-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        Delete Account
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title text-danger">Delete Account</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <p class="mb-3">
+                    Are you sure you want to delete your account, <strong>{{ user.get_first_name() }} {{ user.get_last_name() }}</strong>?
+                    This action <strong>cannot be undone</strong>.
+                </p>
+                <p class="text-muted">
+                    Deleting your account will remove all associated data permanently.
+                </p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <form action="{{ url_for('delete_user', id=user.get_user_id()) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

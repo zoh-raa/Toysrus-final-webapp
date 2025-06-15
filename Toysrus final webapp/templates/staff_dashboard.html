@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Staff Dashboard - ToysRUs{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold text-dark">👋 Welcome, {{ session.get('user_email') }}</h2>
+    </div>
+    <p class="text-muted">Manage toys, users, and business insights efficiently.</p>
+
+    <!-- Dashboard Sections -->
+    <div class="row g-4">
+        <!-- Toy Management -->
+        <div class="col-md-6">
+            <div class="card custom-card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">🧸 Toy Management</h5>
+                    <p class="card-text">Easily update inventory and add new toys.</p>
+                    <a href="{{ url_for('add_toy') }}" class="btn btn-primary">➕ Add New Toy</a>
+                    <a href="{{ url_for('retrieve_toys') }}" class="btn btn-outline-dark">📦 View All Toys</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="col-md-6">
+            <div class="card custom-card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">👨‍👩‍👧‍👦 User Management</h5>
+                    <p class="card-text">Monitor user accounts and customer interactions.</p>
+                    <a href="{{ url_for('retrieve_users') }}" class="btn btn-primary text-white">📋 View Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Updates & Customer Inquiries -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-6">
+            <div class="card custom-card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">🆕 Recent Toy Updates</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for toy in recent_toys %}
+                            <li class="list-group-item custom-card">
+                                <strong>{{ toy.name }}</strong> - {{ toy.category }}
+                                <span class="text-muted">(Updated on {{ toy.updated_at }})</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="card custom-card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">📩 Recent Customer Inquiries</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for inquiry in recent_inquiries %}
+                            <li class="list-group-item custom-card">
+                                <strong>{{ inquiry.customer_email }}</strong>: "{{ inquiry.message }}"
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Sales Statistics -->
+<div class="mt-4">
+    <h3 class="fw-bold text-dark">📊 Sales Insights</h3>
+    <div class="row g-3 mb-4"> <!-- Added margin-bottom for spacing -->
+        <div class="col-md-3">
+            <div class="p-3 custom-card shadow-sm text-center">
+                <h5 class="fw-bold">💰 Monthly Sales</h5>
+                <p class="fs-6 text-dark mb-0">${{ sales_data.monthly }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 custom-card shadow-sm text-center">
+                <h5 class="fw-bold">🎯 Top-Selling Toy</h5>
+                <p class="fs-6 text-dark mb-0">{{ sales_data.top_seller }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 custom-card shadow-sm text-center">
+                <h5 class="fw-bold">📦 Total Orders</h5>
+                <p class="fs-6 text-dark mb-0">{{ sales_data.total_orders }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 custom-card shadow-sm text-center">
+                <h5 class="fw-bold">😊 Customer Satisfaction</h5>
+                <p class="fs-6 text-dark mb-0">{{ sales_data.customer_satisfaction }}%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- Custom Styling -->
+<style>
+    .custom-card {
+        background-color: #f2f2f2 !important; /* Light Grey */
+        border-radius: 15px;
+    }
+    .list-group-item {
+        border: none;
+        padding: 10px;
+        font-size: 1.1rem;
+        background-color: #f2f2f2 !important; /* Ensuring all list items match */
+    }
+    .btn {
+        border-radius: 10px;
+    }
+    .shadow-sm {
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .row.g-3.mb-4 {
+        margin-bottom: 100px; /* Adds space below the sales insights boxes */
+    }
+</style>
+
+{% endblock %}

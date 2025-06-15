@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Trading Thread{% endblock %}
+
+{% block content %}
+
+<style>
+    /* General Body and Layout */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        color: #333;
+    }
+
+    /* Sort Dropdown */
+    #sus {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    #sort {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 200px;
+        margin-bottom: 20px;
+        background-color: #fff;
+    }
+
+    /* Button Styling */
+    #CreateTradeButton {
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        padding: 15px 32px;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        border-radius: 8px;
+        display: block;
+        margin: 20px auto;
+        transition: background-color 0.3s ease;
+        width: 30%;
+    }
+
+    #CreateTradeButton:hover {
+        background-color: #45a049;
+    }
+
+    /* My Trades Button */
+    #MyTradesButton {
+        background-color: #008CBA;
+        color: white;
+        font-size: 16px;
+        padding: 15px 32px;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        border-radius: 8px;
+        display: block;
+        margin: 20px auto;
+        transition: background-color 0.3s ease;
+        width: 30%;
+    }
+
+    #MyTradesButton:hover {
+        background-color: #006F8E;
+    }
+
+    button {
+        background-color: #006400;
+        color: white;
+        font-size: 16px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 80%;
+        margin-top: 15px;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+
+    /* Card Layout */
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 0 15px;
+    }
+
+    .card {
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        margin: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Product Image */
+    img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Product Title and Price */
+    h2 {
+        font-size: 1.2rem;
+        color: #333;
+        margin-top: 10px;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #777;
+        margin-bottom: 10px;
+    }
+
+    /* Price Styling */
+    .price {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #2c3e50;
+    }
+
+    /* User Name Styling */
+    .card-header h3 {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: left;
+        margin-left: 10px;
+    }
+
+    /* Remove Underline for Links */
+    a {
+        text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .flex-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            width: 90%;
+        }
+
+        #CreateTradeButton, #MyTradesButton {
+            width: 50%;
+        }
+    }
+</style>
+
+<h1 class="display-4">Trade</h1>
+
+<!-- Sort Dropdown -->
+<form method="GET" action="{{ url_for('thread') }}" id="sus">
+    <label for="sort">Sort By:</label>
+    <select name="sort" id="sort" onchange="this.form.submit()">
+        <option value="name_asc" {% if request.args.get('sort') == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
+        <option value="name_desc" {% if request.args.get('sort') == 'name_desc' %}selected{% endif %}>Name (Z-A)</option>
+        <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price (Low to High)</option>
+        <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price (High to Low)</option>
+    </select>
+</form>
+
+<!-- Button to Create New Trade -->
+<a href="/CreateTradeToy"><button id="CreateTradeButton">Create Trade</button></a>
+<a href="/OwnTradeOffers"><button id="CreateTradeButton">View Own Trade Offers</button></a>
+<!-- Display Trade Offers -->
+{% if toy_list %}
+    <div class="flex-container">
+        {% for toy in toy_list %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ toy.get_user_name() }}</h3>
+                </div>
+                <img src="{{ url_for('static', filename=toy.get_image() if toy.get_image() else 'tradetoysimages/bear.png') }}">
+                <h2>{{ toy.get_name() }}</h2>
+                <p class="price">Price: ${{ toy.get_price() }}</p>
+                <p>{{ toy.get_remarks() }}</p>
+                <a href="/ThreadDetail/{{ toy.get_id() }}"><button>Details</button></a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 50px;">
+        <h2>No toys available for trade at the moment.</h2>
+    </div>
+{% endif %}
+
+{% endblock %}

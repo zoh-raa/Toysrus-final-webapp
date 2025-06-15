@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Create Feedback{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center mt-4">
+    <div class="p-4 rounded shadow bg-white" style="max-width: 550px; width: 100%;">
+        <h1 class="display-6 text-center text-primary">Submit Your Feedback</h1>
+        <p class="text-center text-muted">We value your feedback! Let us know how we can improve.</p>
+
+        <form method="POST" action="/createFeedback">
+            <!-- User Details (Read-Only) -->
+            <div class="mb-3 p-3 bg-light rounded border">
+                <h5 class="text-center text-secondary">Your Details</h5>
+               <!-- User Information -->
+           
+               <input type="text" class="form-control" value="{{ user._User__first_name }}" readonly>
+               <input type="text" class="form-control" value="{{ user._User__last_name }}" readonly>
+               <input type="email" class="form-control" value="{{ user._User__email }}" readonly>
+               
+
+
+            <!-- Satisfaction Rating -->
+            <div class="mb-3 text-center">
+                <label class="form-label fw-bold">Rate Your Satisfaction</label>
+                <div class="star-rating">
+                    <input type="radio" id="star-5" name="satisfactory" value="5" required />
+                    <label for="star-5">&#9733;</label>
+                    <input type="radio" id="star-4" name="satisfactory" value="4" required />
+                    <label for="star-4">&#9733;</label>
+                    <input type="radio" id="star-3" name="satisfactory" value="3" required />
+                    <label for="star-3">&#9733;</label>
+                    <input type="radio" id="star-2" name="satisfactory" value="2" required />
+                    <label for="star-2">&#9733;</label>
+                    <input type="radio" id="star-1" name="satisfactory" value="1" required />
+                    <label for="star-1">&#9733;</label>
+                </div>
+            </div>
+
+            <!-- Feedback Text -->
+            <div class="mb-3">
+                <label for="improvements" class="form-label fw-bold">Your Feedback</label>
+                <textarea name="improvements" class="form-control" rows="4" placeholder="Enter feedback (min 20 characters)" required minlength="20"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg w-100">Submit Feedback</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Star Rating Styling -->
+<style>
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        font-size: 35px;
+        color: #ccc;
+        cursor: pointer;
+        gap: 5px;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        transition: color 0.3s ease-in-out;
+        cursor: pointer;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: gold;
+    }
+
+    .shadow {
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+{% endblock %}

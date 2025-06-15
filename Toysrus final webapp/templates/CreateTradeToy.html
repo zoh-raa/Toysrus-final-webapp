@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Create Trade Toy{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+<style>
+    /* General Body and Form Styling */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        color: #333;
+    }
+
+    /* Form Container Styling */
+    #form {
+        width: 50%;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Group Styling */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    /* Form Field Styling */
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    .form-control-file {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+    }
+
+    /* Submit Button Styling */
+    .btn-primary {
+        background-color: #4CAF50;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        color: white;
+        border-radius: 8px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        #form {
+            width: 80%;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
+
+</style>
+
+<h1 class="display-4">Create Trade Toy</h1>
+
+<form method="POST" action="" id="form" enctype="multipart/form-data">
+  <div class="form-group">
+    {{ render_field(form.name, class="form-control", placeholder="Enter toy name") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.price, class="form-control", placeholder="Enter toy price") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.remarks, class="form-control", placeholder="Enter toy remarks") }}
+  </div>
+  <div class="form-group">
+    {{ render_field(form.image, class="form-control-file") }}
+  </div>
+  <input type="submit" value="Submit" class="btn-primary"/>
+</form>
+{% endblock %}

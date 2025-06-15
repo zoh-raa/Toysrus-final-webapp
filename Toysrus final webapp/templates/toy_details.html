@@ -1,0 +1,595 @@
+{% extends "base.html" %}
+{% block title %}{{ toy.get_name() }} Details{% endblock %}
+
+{% block content %}
+<!-- Custom Styles -->
+<style>
+    .price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #000; /* Changed price color to black */
+    }
+    .btn-lg {
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 12px;
+    }
+    .btn-success:hover {
+        background: #28a745 !important;
+        opacity: 0.85;
+    }
+
+
+
+
+
+
+
+
+
+
+    .tag {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff; /* White text */
+        background-color: #28a745; /* Green background */
+        border: 1px solid #28a745; /* Green border */
+        border-radius: 20px; /* Rounded corners */
+        text-decoration: none; /* Remove underline */
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .tag:hover {
+        background-color: #218838; /* Darker green on hover */
+        border-color: #1e7e34; /* Darker border on hover */
+        text-decoration: none; /* Ensure no underline on hover */
+    }
+
+    /* Optional: Add a small shadow for a more button-like appearance */
+    .tag {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .tag:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+ /* Custom green button styles */
+.btn-green {
+    background-color: #28a745; /* Bootstrap success green */
+    border-color: #28a745;
+    color: white;
+    padding: 6px 14px; /* Reduced padding to make it thinner */
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+/* Hover effect */
+.btn-green:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Button container for aligning them side by side */
+.button-container {
+    display: flex;
+    gap: 10px; /* Creates spacing between the buttons */
+}
+
+   /* Tab Navigation Styles */
+   .tabs {
+        display: flex;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #555;
+        position: relative;
+    }
+
+    .tab.active {
+        color: #28a745;
+    }
+
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 100%;
+        height: 2px;
+        background-color: #28a745;
+    }
+
+    /* Sections */
+    .section {
+        display: none;
+    }
+
+    .section.active {
+        display: block;
+    }
+    .review-card {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+    /* Q&A Section Styles */
+    .qna-container {
+        margin-top: 20px;
+    }
+
+    .qna-card {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .qna-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+  
+    /* Limit the size of review images */
+    .review-image img {
+        max-width: 200px; /* Set maximum width */
+        max-height: 200px; /* Set maximum height */
+        width: auto; /* Maintain aspect ratio */
+        height: auto; /* Maintain aspect ratio */
+        border-radius: 8px; /* Optional: Add rounded corners */
+        object-fit: cover; /* Ensure the image covers the area without distortion */
+    }
+
+    /* Optional: Add a border or shadow for better visual appeal */
+    .review-image img {
+        border: 2px solid #ddd; /* Light border */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .qna-text {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .qna-date {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .user-actions {
+        margin-top: 10px;
+    }
+
+    .user-actions a, .user-actions button {
+        margin-right: 10px;
+        font-size: 14px;
+        color: #28a745;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .user-actions button {
+        background: none;
+        border: none;
+        color: #dc3545;
+        padding: 0;
+    }
+
+    .like-section {
+        margin-top: 10px;
+    }
+    .reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between reviews */
+    padding: 20px;
+}
+
+    .like-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        color: #007bff;
+    }
+
+    .like-btn:hover {
+        color: #0056b3;
+    }
+
+    .likes-count {
+        margin-left: 5px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .stars {
+        font-size: 24px;  /* Adjust the size of the stars */
+        color: #ccc;  /* Default color for empty stars */
+    }
+
+    .star {
+        display: inline-block;
+    }
+
+    .star.filled {
+        color: #ffcc00;  /* Color for filled stars */
+    }
+
+    .star.half-filled {
+        position: relative;
+        color: #ccc;  /* Base color for half-filled stars */
+    }
+
+    .star.half-filled::before {
+        content: '★';
+        position: absolute;
+        left: 0;
+        width: 50%;
+        overflow: hidden;
+        color: #ffcc00;  /* Color for the filled part of half stars */
+    }
+    .average-rating {
+        margin-bottom: 20px;
+    }
+
+    .average-rating h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .average-rating p {
+        font-size: 16px;
+        color: #555;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <!-- Toy Image Section -->
+        <div class="col-md-6 text-center">
+            <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+                 alt="{{ toy.get_name() }}"
+                 class="img-fluid rounded shadow-sm"
+                 style="max-width: 100%; height: auto; max-height: 450px;">
+        </div>
+
+        <!-- Toy Details Section -->
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-dark">{{ toy.get_name() }}</h1>
+            <p class="text-muted fs-5"><strong>Description:</strong> {{ toy.get_description() }}</p>
+            <p class="price text-dark fw-bold fs-4 mt-3">Price: ${{ "%.2f"|format(toy.get_price()) }}</p>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex gap-3">
+                <!-- Add to Cart Button -->
+<button class="btn btn-success btn-lg flex-grow-1 add-to-cart"
+    data-name="{{ toy.get_name() }}"
+    data-price="{{ toy.get_price() }}">
+    Add to Cart
+</button>
+                <a href="{{ url_for('catalog') }}" class="btn btn-outline-secondary btn-lg flex-grow-1">Back to Catalog</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Notification -->
+<div id="cart-notification" class="alert alert-success position-fixed top-0 start-50 translate-middle-x p-3 shadow-lg rounded d-none"
+     style="z-index: 1050; min-width: 300px; text-align: center;">
+    Item added to cart successfully!
+</div>
+
+   
+<hr>
+
+<div class="average-rating">
+    <h3>Average Rating: {{ average_rating }}</h3>
+    <div class="stars">
+        {% for i in range(1, 6) %}
+            {% if average_rating >= i %}
+                <span class="star filled">&#9733;</span>
+            {% elif average_rating >= i - 0.5 %}
+                <span class="star half-filled">&#9733;</span>
+            {% else %}
+                <span class="star">&#9734;</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<h4>AI Summary</h4>
+<p>{{ summary }}</p>
+
+<div class="container mt-4">
+    <div class="tabs">
+        <div class="tab active" data-tab="reviews">Reviews</div>
+        <div class="tab" data-tab="qna">Q&A</div>
+    </div>
+
+    <div class="section active" id="reviews">
+        <h1 class="display-4 text-center">User Reviews</h1>
+        <a href="{{ url_for('create_review', toy_id=toy.get_toy_id()) }}" class="btn btn-success btn-lg mt-3">✍️ Write a Review</a>
+        
+        <div class="reviews-container">
+            {% for review in reviews_list if review.get_toy_id() == toy.get_toy_id() %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="user-id">👤 <strong>User:</strong> {{ review.get_user_id() }}</span>
+                    <span class="rating">{% for _ in range(review.get_rating()) %}⭐{% endfor %}</span>
+                </div>
+                <p class="review-text">"{{ review.get_comment() }}"</p>
+                <p class="review-date">📅 <strong>Date:</strong> {{ review.get_date() }}</p>
+                
+                <!-- Like Feature -->
+                <form action="{{ url_for('like_review', review_id=review.get_review_id()) }}" method="POST">
+                    <input type="hidden" name="toy_id" value="{{ toy.get_toy_id() }}">  <!-- ✅ Pass toy_id -->
+                    <button type="submit" class="like-btn">
+                        {% if session.get('user_id') in review.liked_users %}
+                            ❤️ Unlike
+                        {% else %}
+                            🤍 Like
+                        {% endif %}
+                    </button>
+                    <span class="likes-count">{{ review.get_likes() }} Likes</span>
+                </form>
+                
+   {% if review.get_image_url() %}
+                <div class="review-image">
+                    <img src="{{ url_for('static', filename=review.get_image_url().replace('static/', '')) }}" alt="Review Image" class="img-fluid">
+                </div>
+                {% endif %}
+
+                <!-- User Actions -->
+                {% if session.get('user_id') == review.get_user_id() %}
+                <div class="user-actions">
+                
+                    <form action="{{ url_for('delete_review') }}" method="POST">
+                        <input type="hidden" name="toy_id" value="{{ review.get_toy_id() }}">
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this review?')">Delete Review</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section" id="qna">
+        <h1 class="display-4 text-center">Q&A</h1>
+        <a href="{{ url_for('create_qna', toy_id=toy.get_toy_id()) }}" class="btn btn-green mb-3">Ask a Question</a>
+        
+        <div class="qna-container">
+            {% for qna_entry in qna_list if qna_entry.get_toy_id() == toy.get_toy_id() %}
+            <div class="qna-card">
+                <div class="qna-header">
+                    <span class="user-id">👤 <strong>User:</strong> {{ qna_entry.get_user_id() }}</span>
+                </div>
+                <p class="qna-text">"{{ qna_entry.get_question() }}"</p>
+                <p class="qna-date">📅 <strong>Date:</strong> {{ qna_entry.get_date_published() }}</p>
+
+                {% if qna_entry.answers %}  <!-- ✅ Check if answers exist -->
+                <div class="qna-answers">
+                    <h5>Answers:</h5>
+                    {% for answer in qna_entry.answers %}  <!-- ✅ Loop through answers -->
+                    <div class="qna-answer">
+                        <p>📢 <strong>{{ answer['user_id'] }}:</strong> {{ answer['answer'] }}</p>
+                        <p class="qna-date">📅 <small>{{ answer['date'] }}</small></p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+
+                <!-- Answer Feature -->
+                <form action="{{ url_for('create_qna_answer') }}" method="POST">
+
+
+                    <input type="hidden" name="qna_id" value="{{ qna_entry.get_qna_id() }}">
+                    <textarea name="answer_text" class="form-control" placeholder="Write your answer..." required></textarea>
+                    <button type="submit" class="btn btn-success btn-sm mt-2">Submit Answer</button>
+                </form>
+                
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll('.tab');
+    const sections = document.querySelectorAll('.section');
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            sections.forEach(section => section.classList.remove("active"));
+            const target = tab.getAttribute("data-tab");
+            document.getElementById(target).classList.add("active");
+            tab.classList.add("active");
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("JavaScript Loaded ✅");
+
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            let itemName = this.getAttribute("data-name");
+            let itemPrice = this.getAttribute("data-price");
+
+            console.log(`Adding to cart: ${itemName} - $${itemPrice}`);
+
+            fetch("{{ url_for('add_to_cart') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: itemName, price: itemPrice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response from server:", data);
+                if (data.status === "success") {
+                    showNotification(data.message);
+                } else {
+                    showNotification("❌ Failed to add item to cart.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showNotification("❌ Something went wrong.");
+            });
+        });
+    });
+
+    function showNotification(message) {
+        let notification = document.getElementById("cart-notification");
+        if (!notification) {
+            console.error("Notification element not found ❌");
+            return;
+        }
+
+        console.log("Showing notification:", message);
+        notification.innerText = message;
+        notification.classList.remove("d-none");
+
+        setTimeout(() => {
+            notification.classList.add("d-none");
+        }, 3000);
+    }
+});
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-qna").forEach(button => {
+        button.addEventListener("click", function () {
+            const qnaId = this.dataset.qnaId;
+            const toyId = "{{ toy.get_toy_id() }}";
+
+            if (!confirm("Are you sure you want to delete this Q&A?")) return;
+
+            // ✅ Debugging: Log before sending request
+            console.log("Attempting to delete QnA:", qnaId, "for Toy:", toyId);
+
+            fetch("{{ url_for('delete_qna') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ "qna_id": qnaId, "toy_id": toyId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Delete Response:", data);  // ✅ Debugging response
+
+                if (data.success) {
+                    const qnaElement = document.getElementById(`qna-${qnaId}`);
+                    if (qnaElement) {
+                        qnaElement.remove();  // ✅ Remove QnA from UI instantly
+                        console.log("QnA deleted successfully from UI.");
+                    } else {
+                        console.error("Could not find QnA element to remove:", `qna-${qnaId}`);
+                    }
+                } else {
+                    alert("Error deleting QnA: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+});
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.section');
+
+        // ✅ Remember the last active tab across page reloads
+        const activeTab = localStorage.getItem("activeTab") || "reviews";
+        const activeTabElement = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+        const activeSection = document.getElementById(activeTab);
+
+        if (activeTabElement && activeSection) {  // ✅ Prevent errors if elements are missing
+            activeTabElement.classList.add("active");
+            activeSection.classList.add("active");
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                sections.forEach(section => section.classList.remove("active"));
+
+                const target = tab.getAttribute("data-tab");
+                const targetElement = document.getElementById(target);
+
+                if (targetElement) {  // ✅ Prevent errors if tab does not exist
+                    tab.classList.add("active");
+                    targetElement.classList.add("active");
+
+                    // ✅ Store active tab in localStorage
+                    localStorage.setItem("activeTab", target);
+                }
+            });
+        });
+
+        // ✅ Function to refresh tags dynamically
+        function refreshTags() {
+            fetch("{{ url_for('get_tags', toy_id=toy.get_toy_id()) }}")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tagContainer = document.getElementById("tag-container");
+                    if (tagContainer) {
+                        tagContainer.innerHTML = ""; // ✅ Clear old tags
+                        data.tags.forEach(tag => {
+                            const tagElement = document.createElement("a");
+                            tagElement.href = "{{ url_for('retrieve_reviews') }}?tag=" + encodeURIComponent(tag);
+                            tagElement.classList.add("tag");
+                            tagElement.textContent = tag;
+                            tagContainer.appendChild(tagElement);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching tags:", error)); // ✅ Catch errors
+        }
+
+        // ✅ Call refreshTags after submitting a review
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", function () {
+                setTimeout(refreshTags, 2000); // ✅ Delay to allow backend processing
+            });
+        });
+    });
+
+
+</script>
+{% endblock %}
+
+
+    </div>
+</div>

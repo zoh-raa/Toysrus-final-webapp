@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Trading Thread{% endblock %}
+
+{% block content %}
+
+<style>
+    /* General Body Styling */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-top: 30px;
+    }
+
+    /* Container for the product list */
+    .product-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin-top: 20px;
+        padding: 20px;
+    }
+
+    /* Individual Product Item */
+    .product-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        margin: 20px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: auto; /* Let the card expand based on content */
+        min-height: 400px; /* Ensure the card has a minimum height */
+    }
+
+    .product-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-bottom: 15px;
+    }
+
+    .product-card h2 {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .product-card p {
+        font-size: 1rem;
+        color: #777;
+        margin-bottom: 15px;
+    }
+
+    .price {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .product-card .details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    /* Flexbox for aligning the toy details */
+    .flex-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .flex-items {
+        margin-bottom: 10px;
+        font-size: 1rem;
+        color: #555;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Delete Toy Button Styling */
+    .delete-toy-btn {
+        background-color: #d9534f; /* Red color */
+        color: white;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: auto; /* Ensure the button stays at the bottom */
+        transition: background-color 0.3s ease;
+        width: 100%; /* Ensure the button stretches across the card width */
+    }
+
+    .delete-toy-btn:hover {
+        background-color: #c9302c; /* Darker red on hover */
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        overflow: auto;
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+    }
+
+    .modal-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .modal-buttons button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .confirm-btn {
+        background-color: #28a745; /* Green color */
+        color: white;
+    }
+
+    .cancel-btn {
+        background-color: #d9534f; /* Red color */
+        color: white;
+    }
+
+    .modal-buttons button:hover {
+        opacity: 0.9;
+    }
+
+    .card-header h3 {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: left;
+        margin-left: 10px;
+    }
+</style>
+
+<h1 class="display-4">Trade Detail</h1>
+
+<div class="product-container">
+    {% for toy in toy_list %}
+    <div class="product-card">
+        <div class="card-header">
+                    <h3>{{ toy.get_user_name() }}</h3>
+        </div>
+        <img src="{{ url_for('static', filename=toy.get_image() if toy.get_image() else 'tradetoysimages/bear.png') }}">
+        <h2>{{ toy.get_name() }}</h2>
+        <p class="price">${{ toy.get_price() }}</p>
+        <div class="details">
+            <div class="flex-items">{{ toy.get_remarks() }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal for Confirming Trade -->
+<div id="tradeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalHeader">Trade Offer</div>
+        <div id="modalBody">Do you want to send a trade offer to this user?</div>
+        <div class="modal-buttons">
+            <button class="confirm-btn" onclick="confirmTrade()">Yes</button>
+            <button class="cancel-btn" onclick="closeModal()">No</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Store the user's name and toy name for the modal
+    let currentToyOwner = '';
+    let currentToyName = '';
+
+    // Show the modal and set the user name and toy name
+    function offerTrade(userName, toyName) {
+        currentToyOwner = userName;
+        currentToyName = toyName;
+
+        const modal = document.getElementById('tradeModal');
+        const modalHeader = document.getElementById('modalHeader');
+        const modalBody = document.getElementById('modalBody');
+
+        modalHeader.innerText = 'Trade Offer';
+        modalBody.innerText = `Do you want to send a trade offer to ${currentToyOwner} for the toy: ${currentToyName}?`;
+
+        modal.style.display = 'block'; // Show the modal
+    }
+
+    // Confirm trade
+    function confirmTrade() {
+        alert(`Trade offer sent to ${currentToyOwner} for the toy: ${currentToyName}`);
+        closeModal(); // Close the modal after confirmation
+    }
+
+    // Close the modal
+    function closeModal() {
+        const modal = document.getElementById('tradeModal');
+        modal.style.display = 'none';
+    }
+
+    // Close the modal if clicked outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('tradeModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+{% endblock %}

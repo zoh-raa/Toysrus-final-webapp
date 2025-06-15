@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Ask a Question{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Ask a Question</h1>
+
+<!-- Form for asking a question -->
+<form method="POST" action="{{ url_for('create_qna', toy_id=toy.get_toy_id()) }}">
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <input type="hidden" name="toy_id" value="{{ toy.get_toy_id() if toy else '' }}">
+
+    <div class="form-group">
+        <label for="question" class="form-label">Your Question</label>
+        <textarea name="question" class="form-control" required minlength="5" maxlength="500"
+                  placeholder="Ask something about this toy..."></textarea>
+    </div>
+
+    <input type="submit" value="Submit Question" class="btn btn-primary mt-3"/>
+</form>
+
+{% endblock %}

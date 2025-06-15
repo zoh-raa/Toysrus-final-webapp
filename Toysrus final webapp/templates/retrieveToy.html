@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Retrieve Toys{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Retrieve Toys</h1>
+
+<div>
+  {% if toys %}
+  <p class="mb-3"><strong>Total Toys in Inventory:</strong> {{ toys | length }}</p>
+
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Image</th>
+        <th class="text-center">Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for toy in toys %}
+      <tr>
+        <td>{{ toy.get_toy_id() }}</td>
+        <td><strong>{{ toy.get_name() }}</strong></td>
+        <td>{{ toy.get_description() }}</td>
+        <td>${{ "%.2f"|format(toy.get_price()) }}</td>
+        <td>{{ toy.get_category() }}</td>
+        <td>
+          <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+               alt="{{ toy.get_name() }}" class="img-thumbnail" width="100">
+        </td>
+        <td class="text-center">
+          <div class="d-flex align-items-center justify-content-center">
+            <!-- Decrease Button -->
+            <form action="{{ url_for('update_toy_quantity', id=toy.get_toy_id(), action='decrease') }}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-danger btn-sm px-3"
+                      {% if toy.get_quantity() <= 1 %}disabled{% endif %}>
+                <strong>-</strong>
+              </button>
+            </form>
+
+            <!-- Quantity Input Field (Without Spinner) -->
+            <form action="{{ url_for('set_toy_quantity', id=toy.get_toy_id()) }}" method="POST" class="mx-2 quantity-form">
+              <input type="number" name="new_quantity" value="{{ toy.get_quantity() }}"
+                     class="form-control text-center quantity-input no-spinner"
+                     style="width: 60px; display: inline-block;" min="1"
+                     data-toy-id="{{ toy.get_toy_id() }}">
+            </form>
+
+            <!-- Increase Button -->
+            <form action="{{ url_for('update_toy_quantity', id=toy.get_toy_id(), action='increase') }}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-success btn-sm px-3">
+                <strong>+</strong>
+              </button>
+            </form>
+          </div>
+        </td>
+        <td>
+  <div class="d-flex flex-column gap-2">
+    <a href="{{ url_for('update_toy', id=toy.get_toy_id()) }}" class="btn btn-warning btn-sm">Update</a>
+        <!-- Delete Button Triggers Modal -->
+    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal_{{ toy.get_toy_id() }}">
+      Delete
+    </button>
+  </div>
+</td>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal_{{ toy.get_toy_id() }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Confirmation</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        Are you sure you want to delete <strong>{{ toy.get_name() }}</strong> (ID: {{ toy.get_toy_id() }})?
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <form action="{{ url_for('delete_toy', id=toy.get_toy_id()) }}" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <p class="text-center">No toys found in the database.</p>
+  {% endif %}
+</div>
+
+<!-- JavaScript to Submit the Form Automatically -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".quantity-input").forEach(function (input) {
+      input.addEventListener("change", function () {
+        this.closest("form").submit(); // Submit form when quantity changes
+      });
+    });
+  });
+</script>
+
+<!-- CSS to Remove Spinner from Number Input -->
+<style>
+  /* Hide spinner arrows for number inputs */
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-spinner {
+    -moz-appearance: textfield; /* Firefox */
+  }
+</style>
+
+{% endblock %}

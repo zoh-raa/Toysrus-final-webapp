@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h2>Checkout</h2>
+
+
+<!-- ✅ Cart Summary Before Checkout -->
+{% if cart_items %}
+    <h3>Order Summary</h3>
+    <ul class="cart-summary">
+        {% for item in cart_items %}
+            <li>{{ item.name }} (x{{ item.quantity }}) - ${{ "%.2f"|format(item.total_price) }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Your cart is empty. <a href="{{ url_for('home') }}">Go back to shop</a>.</p>
+{% endif %}
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <label for="name">Full Name:</label>
+    {{ form.name(class="form-control", id="name") }}
+
+    <label for="email">Email:</label>
+    {{ form.email(class="form-control", id="email") }}
+
+    <label for="address">Address:</label>
+    {{ form.address(class="form-control", id="address") }}
+
+    <label for="card_number">Card Number:</label>
+    {{ form.card_number(class="form-control", id="card_number") }}
+
+    <label for="expiration_date">Expiration Date (MM/YY):</label>
+    {{ form.expiration_date(class="form-control", id="expiration_date") }}
+
+    <label for="cvv">CVV:</label>
+    {{ form.cvv(class="form-control", id="cvv") }}
+
+    <br>
+    <button type="submit" class="btn btn-success">Submit Payment</button>
+</form>
+
+
+<style>
+    .cart-summary {
+        list-style-type: none;
+        padding: 0;
+    }
+    .cart-summary li {
+        padding: 5px 0;
+        font-size: 16px;
+    }
+    .flash-messages {
+        margin-bottom: 15px;
+    }
+    .alert {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+</style>
+
+{% endblock %}

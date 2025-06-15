@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4 fw-bold text-dark">Search Results for "{{ query }}"</h1>
+
+    {% if found_toys %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for toy in found_toys %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative toy-card"
+                 style="background-color: #f8f9fa;">
+
+                <div class="toy-image-container">
+                    <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+                         class="card-img-top img-fluid"
+                         alt="{{ toy.get_name() }}"
+                         style="height: 230px; object-fit: cover;">
+                </div>
+
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title text-dark fw-bold">{{ toy.get_name() }}</h5>
+                    <p class="price text-dark fw-bold fs-5 mb-2">${{ "%.2f"|format(toy.get_price()) }}</p>
+
+                    <div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
+                        <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}"
+                           class="btn btn-outline-primary fw-bold flex-grow-1">View</a>
+
+                        <!-- Add to Cart Button -->
+                        <button class="btn btn-success fw-bold add-to-cart"
+                                data-name="{{ toy.get_name() }}"
+                                data-price="{{ toy.get_price() }}">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <p class="text-center">No results found for "{{ query }}".</p>
+
+    {% if similar_toys %}
+    <h3 class="text-center">Other Similar Toys You May Like</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for toy in similar_toys %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative toy-card"
+                 style="background-color: #f8f9fa;">
+
+                <div class="toy-image-container">
+                    <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+                         class="card-img-top img-fluid"
+                         alt="{{ toy.get_name() }}"
+                         style="height: 230px; object-fit: cover;">
+                </div>
+
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title text-dark fw-bold">{{ toy.get_name() }}</h5>
+                    <p class="price text-dark fw-bold fs-5 mb-2">${{ "%.2f"|format(toy.get_price()) }}</p>
+
+                    <div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
+                        <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}"
+                           class="btn btn-outline-primary fw-bold flex-grow-1">View</a>
+
+                        <!-- Add to Cart Button -->
+                        <button class="btn btn-success fw-bold add-to-cart"
+                                data-name="{{ toy.get_name() }}"
+                                data-price="{{ toy.get_price() }}">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% endif %}
+</div>
+
+<!-- Floating Notification -->
+<div id="cart-notification" class="alert alert-success position-fixed top-0 start-50 translate-middle-x p-3 shadow-lg rounded d-none"
+     style="z-index: 1050; min-width: 300px; text-align: center;">
+    Item added to cart successfully!
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .toy-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        border-radius: 15px;
+    }
+    .toy-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    .price {
+        color: #000;
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    .btn {
+        transition: background 0.3s ease-in-out;
+    }
+    .btn-success:hover {
+        background: #28a745 !important;
+        opacity: 0.85;
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            let itemName = this.getAttribute("data-name");
+            let itemPrice = this.getAttribute("data-price");
+
+            fetch("{{ url_for('add_to_cart') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: itemName, price: itemPrice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showNotification(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+
+    function showNotification(message) {
+        let notification = document.getElementById("cart-notification");
+
+        // Update the message
+        notification.innerText = message;
+
+        // Show the notification
+        notification.classList.remove("d-none");
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.add("d-none");
+        }, 3000);
+    }
+</script>
+
+{% endblock %}

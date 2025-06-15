@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmation{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>✅ Payment Successful</h2>
+    <p><strong>Name:</strong> {{ order.name }}</p>
+    <p><strong>Email:</strong> {{ order.email }}</p>
+    <p><strong>Address:</strong> {{ order.address }}</p>
+
+    {% if order.applied_discount %}
+    <p>Applied Discount: {{ order.applied_discount.name }} ({{ order.applied_discount.percentage }}% Off)</p>
+    <p>Discount Amount: ${{ "%.2f"|format(order.discount_amount) }}</p>
+    {% endif %}
+
+    <p><strong>Total Amount Paid:</strong> ${{ "%.2f"|format(order.total_after_discount) }}</p>
+
+    <h3>🛒 Order Details</h3>
+    <ul>
+        {% for item in order.cart_items %}
+        <li>{{ item.name }} (x{{ item.quantity }}) - ${{ "%.2f"|format(item.total_price) }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">Return to Home</a>
+</div>
+{% endblock %}

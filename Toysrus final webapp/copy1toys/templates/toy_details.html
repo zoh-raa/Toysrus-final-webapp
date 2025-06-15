@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+{% block title %}{{ toy.get_name() }} Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <!-- Toy Image Section -->
+        <div class="col-md-6 text-center">
+            <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+                 alt="{{ toy.get_name() }}"
+                 class="img-fluid rounded shadow-sm"
+                 style="max-width: 100%; height: auto; max-height: 450px;">
+        </div>
+
+        <!-- Toy Details Section -->
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-dark">{{ toy.get_name() }}</h1>
+            <p class="text-muted fs-5"><strong>Description:</strong> {{ toy.get_description() }}</p>
+            <p class="price text-dark fw-bold fs-4 mt-3">Price: ${{ toy.get_price() }}</p>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex gap-3">
+                <button class="btn btn-success btn-lg flex-grow-1">Add to Cart</button>
+                <a href="{{ url_for('catalog') }}" class="btn btn-outline-secondary btn-lg flex-grow-1">Back to Catalog</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+<!-- Display the average rating -->
+<div class="average-rating">
+    <h3>Average Rating: {{ average_rating }}/5</h3>
+    <!-- Display star icons based on the average rating -->
+    <div class="stars">
+        {% for i in range(1, 6) %}
+            {% if average_rating >= i %}
+                <span class="star filled">&#9733;</span>  <!-- Full star -->
+            {% elif average_rating >= i - 0.5 %}
+                <span class="star half-filled">&#9733;</span>  <!-- Half star -->
+            {% else %}
+                <span class="star">&#9734;</span>  <!-- Empty star -->
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+
+<h2>AI Summary</h2>
+<p>{{ summary }}</p>
+<!-- Tabs for Reviews & QnA -->
+<div class="container mt-4">
+    <div class="tabs">
+        <div class="tab active" data-tab="reviews">Reviews</div>
+        <div class="tab" data-tab="qna">Q&A</div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="section active" id="reviews">
+        <h1 class="display-4 text-center">User Reviews</h1>
+
+        {% if global_tags %}
+    <h3 class="text-center">Popular Tags:</h3>
+    <div id="tag-container" class="tag-container">
+        {% for tag in global_tags %}
+            <a href="{{ url_for('retrieve_reviews', toy_id=toy.get_toy_id(), tag=tag) }}" class="tag">{{ tag }}</a>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <!-- Write a Review Button -->
+        <a href="{{ url_for('create_review', toy_id=toy.get_toy_id()) }}" class="btn btn-primary mb-3">
+            Write a Review
+        </a>
+
+        <!-- Search Form -->
+        <form method="GET" action="{{ url_for('retrieve_reviews') }}" class="search-form">
+            <div class="form-group">
+                <input type="text" name="search_query" class="form-control" placeholder="Search Reviews" value="{{ request.args.get('search_query', '') }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <!-- Reviews Container -->
+        <div class="reviews-container">
+            {% for review in reviews_list %}
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="user-id">👤 <strong>User:</strong> {{ review.get_user_id() }}</span>
+                    <span class="rating">
+                        {% for _ in range(review.get_rating()) %}⭐{% endfor %}
+                    </span>
+                </div>
+                <p class="review-text">"{{ review.get_comment() }}"</p>
+                <p class="review-date">📅 <strong>Date:</strong> {{ review.get_date() }}</p>
+            <!-- Comment out or remove this section -->
+
+            <div class="like-section">
+                <form action="{{ url_for('like_review', review_id=review.get_review_id()) }}" method="POST">
+                    <input type="hidden" name="toy_id" value="{{ toy.get_toy_id() }}">
+                    <button type="submit" class="like-btn">
+                        {% if session.get('user_id') in review.liked_users %}
+                            ❤️ Unlike
+                        {% else %}
+                            🤍 Like
+                        {% endif %}
+                    </button>
+                    <span class="likes-count">{{ review.get_likes() }} Likes</span>
+                </form>
+            </div>
+
+                {% if review.get_image_url() %}
+                <div class="review-image">
+                    <img src="{{ url_for('static', filename=review.get_image_url().replace('static/', '')) }}" alt="Review Image" class="img-fluid">
+                </div>
+                {% endif %}
+
+                <!-- User Actions -->
+                {% if session.get('user_id') == review.get_user_id() %}
+                <div class="user-actions">
+                    <a href="{{ url_for('update_review', review_id=review.get_review_id(), toy_id=toy.get_toy_id()) }}">Edit Review</a>
+                    <form action="{{ url_for('delete_review') }}" method="POST">
+                        <input type="hidden" name="toy_id" value="{{ review.get_toy_id() }}">
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this review?')">Delete Review</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Q&A Section -->
+    <div class="section" id="qna">
+        <h1 class="display-4 text-center">Q&A</h1>
+
+        <!-- Ask a Question Button -->
+        <a href="{{ url_for('create_qna', toy_id=toy.get_toy_id()) }}" class="btn btn-primary mb-3">
+            Ask a Question
+        </a>
+
+        <!-- Search Form for Q&A -->
+        <form method="GET" action="{{ url_for('retrieve_qna') }}" class="search-form">
+            <div class="form-group">
+                <input type="text" name="search_query" class="form-control" placeholder="Search Q&A" value="{{ request.args.get('search_query', '') }}">
+                <input type="hidden" name="toy_id" value="{{ toy.get_toy_id() }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+    <!-- Q&A Container -->
+<div class="qna-container">
+    {% for qna_entry in qna_list %}
+    <div class="qna-card" id="qna-{{ qna_entry.get_qna_id() }}">
+        <div class="qna-header">
+            <span class="user-id">👤 <strong>User:</strong> {{ qna_entry.get_user_id() }}</span> 
+        </div>
+        <p class="qna-text">"{{ qna_entry.get_question() }}"</p>
+        <p class="qna-date">📅 <strong>Date:</strong> {{ qna_entry.get_date_published() }}</p>
+
+        <!-- Display Answers -->
+        {% if qna_entry.get_answers() %}
+        <div class="qna-answers">
+            <h5>Answers:</h5>
+            {% for answer in qna_entry.get_answers() %}
+            <div class="qna-answer">
+                <p>📢 <strong>{{ answer['user_id'] }}:</strong> {{ answer['answer'] }}</p>
+                <p class="qna-date">📅 <small>{{ answer['date'] }}</small></p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Reply Form -->
+        <form action="{{ url_for('create_qna_answer') }}" method="POST">
+            <input type="hidden" name="qna_id" value="{{ qna_entry.get_qna_id() }}">
+            <input type="hidden" name="toy_id" value="{{ toy.get_toy_id() }}">
+            <textarea name="answer_text" class="form-control" placeholder="Write your answer..." required></textarea>
+            <button type="submit" class="btn btn-success btn-sm mt-2">Submit Answer</button>
+        </form>
+
+        <!-- ✅ Delete Button (ONLY for QnA Author & Admins) -->
+        {% if session.get('user_id') == qna_entry.get_user_id() or session.get('user_id') in admin_emails %}
+        <button class="btn btn-danger btn-sm delete-qna" data-qna-id="{{ qna_entry.get_qna_id() }}">
+            🗑️ Delete QnA
+        </button>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<!-- Custom Styles -->
+<style>
+    .price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #000; /* Changed price color to black */
+    }
+    .btn-lg {
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 12px;
+    }
+    .btn-success:hover {
+        background: #28a745 !important;
+        opacity: 0.85;
+    }
+
+
+
+
+
+
+
+
+
+   /* Tab Navigation Styles */
+   .tabs {
+        display: flex;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #555;
+        position: relative;
+    }
+
+    .tab.active {
+        color: #007bff;
+    }
+
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 100%;
+        height: 2px;
+        background-color: #007bff;
+    }
+
+    /* Sections */
+    .section {
+        display: none;
+    }
+
+    .section.active {
+        display: block;
+    }
+
+    /* Q&A Section Styles */
+    .qna-container {
+        margin-top: 20px;
+    }
+
+    .qna-card {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .qna-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .qna-text {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .qna-date {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .user-actions {
+        margin-top: 10px;
+    }
+
+    .user-actions a, .user-actions button {
+        margin-right: 10px;
+        font-size: 14px;
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .user-actions button {
+        background: none;
+        border: none;
+        color: #dc3545;
+        padding: 0;
+    }
+
+    .like-section {
+        margin-top: 10px;
+    }
+
+    .like-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        color: #007bff;
+    }
+
+    .like-btn:hover {
+        color: #0056b3;
+    }
+
+    .likes-count {
+        margin-left: 5px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .stars {
+        font-size: 24px;  /* Adjust the size of the stars */
+        color: #ccc;  /* Default color for empty stars */
+    }
+
+    .star {
+        display: inline-block;
+    }
+
+    .star.filled {
+        color: #ffcc00;  /* Color for filled stars */
+    }
+
+    .star.half-filled {
+        position: relative;
+        color: #ccc;  /* Base color for half-filled stars */
+    }
+
+    .star.half-filled::before {
+        content: '★';
+        position: absolute;
+        left: 0;
+        width: 50%;
+        overflow: hidden;
+        color: #ffcc00;  /* Color for the filled part of half stars */
+    }
+    .average-rating {
+        margin-bottom: 20px;
+    }
+
+    .average-rating h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .average-rating p {
+        font-size: 16px;
+        color: #555;
+    } 
+</style>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-qna").forEach(button => {
+        button.addEventListener("click", function () {
+            const qnaId = this.dataset.qnaId;
+            const toyId = "{{ toy.get_toy_id() }}"; 
+
+            if (!confirm("Are you sure you want to delete this Q&A?")) return;
+
+            // ✅ Debugging: Log before sending request
+            console.log("Attempting to delete QnA:", qnaId, "for Toy:", toyId);
+
+            fetch("{{ url_for('delete_qna') }}", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ "qna_id": qnaId, "toy_id": toyId })  
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Delete Response:", data);  // ✅ Debugging response
+
+                if (data.success) {
+                    const qnaElement = document.getElementById(`qna-${qnaId}`);
+                    if (qnaElement) {
+                        qnaElement.remove();  // ✅ Remove QnA from UI instantly
+                        console.log("QnA deleted successfully from UI.");
+                    } else {
+                        console.error("Could not find QnA element to remove:", `qna-${qnaId}`);
+                    }
+                } else {
+                    alert("Error deleting QnA: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+});
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.section');
+
+        // ✅ Remember the last active tab across page reloads
+        const activeTab = localStorage.getItem("activeTab") || "reviews";
+        const activeTabElement = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+        const activeSection = document.getElementById(activeTab);
+
+        if (activeTabElement && activeSection) {  // ✅ Prevent errors if elements are missing
+            activeTabElement.classList.add("active");
+            activeSection.classList.add("active");
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                sections.forEach(section => section.classList.remove("active"));
+
+                const target = tab.getAttribute("data-tab");
+                const targetElement = document.getElementById(target);
+
+                if (targetElement) {  // ✅ Prevent errors if tab does not exist
+                    tab.classList.add("active");
+                    targetElement.classList.add("active");
+
+                    // ✅ Store active tab in localStorage
+                    localStorage.setItem("activeTab", target);
+                }
+            });
+        });
+
+        // ✅ Function to refresh tags dynamically
+        function refreshTags() {
+            fetch("{{ url_for('get_tags', toy_id=toy.get_toy_id()) }}")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tagContainer = document.getElementById("tag-container");
+                    if (tagContainer) {
+                        tagContainer.innerHTML = ""; // ✅ Clear old tags
+                        data.tags.forEach(tag => {
+                            const tagElement = document.createElement("a");
+                            tagElement.href = "{{ url_for('retrieve_reviews') }}?tag=" + encodeURIComponent(tag);
+                            tagElement.classList.add("tag");
+                            tagElement.textContent = tag;
+                            tagContainer.appendChild(tagElement);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching tags:", error)); // ✅ Catch errors
+        }
+
+        // ✅ Call refreshTags after submitting a review
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", function () {
+                setTimeout(refreshTags, 2000); // ✅ Delay to allow backend processing
+            });
+        });
+    });
+
+
+</script>
+{% endblock %}

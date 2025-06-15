@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}ToysRUs - Discounts List{% endblock %}
+{% block content %}
+<h1 class="display-4">Discounts List</h1>
+<div>
+  {% if count == 0 %}
+  <p>There are no discounts.</p>
+  {% elif count == 1 %}
+  <p>There is 1 discount.</p>
+  {% else %}
+  <p>There are {{ count }} discounts.</p>
+  {% endif %}
+</div>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Percentage</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Actions</th>
+    </tr>
+    {% for discount in discounts_list %}
+    <tr>
+        <td>{{ discount.get_discount_id() }}</td>
+        <td>{{ discount.get_name() }}</td>
+        <td>{{ discount.get_percentage() }}%</td>
+        <td>{{ discount.get_startdate() }}</td>
+        <td>{{ discount.get_enddate() }}</td>
+        <td>
+            <a href="/update_discount/{{discount.get_discount_id()}}" class="btn btn-warning">Update</a>
+            <form action="{{ url_for('delete_discount', id=discount.get_discount_id()) }}" method="POST">
+               <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{discount.get_discount_id()}}">Delete</button>
+            <!-- The Modal -->
+<div class="modal" id="myModal_{{discount.get_discount_id()}}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Confirmation</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Are you sure you want to delete {{discount.get_name()}}?
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <input type="submit" value="Delete" class="btn btn-danger">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+        </form>
+          </td>
+        </tr>
+      {% endfor %}
+  </table>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Update Toy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Update Toy Information</h1>
+    <form method="POST" action="{{ url_for('update_toy', id=toy.get_toy_id()) }}">
+        <div class="form-group">
+            <label for="name">Toy Name:</label>
+            <input type="text" name="name" id="name" class="form-control" value="{{ toy.get_name() }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea name="description" id="description" class="form-control" required>{{ toy.get_description() }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" step="0.01" name="price" id="price" class="form-control" value="{{ toy.get_price() }}" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select name="category" id="category" class="form-control">
+                <option value="dolls" {% if toy.get_category() == 'dolls' %}selected{% endif %}>Dolls</option>
+                <option value="lego" {% if toy.get_category() == 'lego' %}selected{% endif %}>Lego</option>
+                <option value="stuffed_toys" {% if toy.get_category() == 'stuffed_toys' %}selected{% endif %}>Stuffed Toys</option>
+                <option value="board_games" {% if toy.get_category() == 'board_games' %}selected{% endif %}>Board Games</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="image">Image Filename:</label>
+            <input type="text" name="image" id="image" class="form-control" value="{{ toy.get_image() }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Update Toy</button>
+    </form>
+</div>
+{% endblock %}

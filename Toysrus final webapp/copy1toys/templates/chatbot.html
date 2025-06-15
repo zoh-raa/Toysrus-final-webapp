@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}ToysRUs - Chatbot{% endblock %}
+
+{% block content %}
+<style>
+    .chatbot-container {
+        width: 350px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin: 20px auto;
+    }
+
+    .chatbot-header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .chatbot-body {
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .chatbot-message {
+        background-color: #f1f1f1;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .chatbot-options button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .chatbot-options button:hover {
+        background-color: #0056b3;
+    }
+
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+
+    .chatbot-input button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .chatbot-input button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="chatbot-container">
+    <div class="chatbot-header">
+        <h2>ToysRUs Chatbot</h2>
+    </div>
+    <div class="chatbot-body" id="chatbot-body">
+        <div class="chatbot-message">
+            <p>Hey! I'm ToysRUs's chatbot! Feel free to ask any questions you may have :)</p>
+        </div>
+        <div class="chatbot-options">
+            <button onclick="sendMessage('Send an email to customer service')">Send an email to customer service
+            </button>
+            <button onclick="sendMessage('Inquire about returns, refunds, and exchanges')">Inquire about returns,
+                refunds, and exchanges
+            </button>
+            <button onclick="sendMessage('Inquire about the Star Card Program')">Inquire about the Star Card Program
+            </button>
+            <button onclick="sendMessage('Where can I use my promo code?')">Where can I use my promo code?</button>
+        </div>
+    </div>
+    <div class="chatbot-input">
+        <input type="text" id="user-input" placeholder="Type your question here...">
+        <button onclick="sendUserMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage(message) {
+    const chatbotBody = document.getElementById('chatbot-body');
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chatbot-message';
+    userMessage.innerHTML = `<p><strong>You:</strong> ${message}</p>`;
+    chatbotBody.appendChild(userMessage);
+
+    // Send the message to the backend
+    const response = await fetch('/chat', {  // Ensure this is /chat, not /chatbot
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message }),
+    });
+    const data = await response.json();
+
+    const botResponse = document.createElement('div');
+    botResponse.className = 'chatbot-message';
+    botResponse.innerHTML = `<p><strong>Bot:</strong> ${data.response}</p>`;
+    chatbotBody.appendChild(botResponse);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight; // Scroll to the bottom
+}
+
+    function sendUserMessage() {
+        const userInput = document.getElementById('user-input');
+        const message = userInput.value.trim();
+        if (message) {
+            sendMessage(message);
+            userInput.value = ''; // Clear the input field
+        }
+    }
+
+    function getBotResponse(message) {
+        const responses = {
+            "Send an email to customer service": "You can send an email to support@toysrus.com for assistance.",
+            "Inquire about returns, refunds, and exchanges": "Our return policy allows returns within 30 days with a receipt. Please visit our Returns page for more details.",
+            "Inquire about the Star Card Program": "The Star Card Program offers exclusive discounts and rewards. You can sign up at any ToysRUs store or online.",
+            "Where can I use my promo code?": "Promo codes can be used during checkout on our website or in-store at the point of sale."
+        };
+
+        return responses[message] || "I'm sorry, I don't understand that question. Please try one of the options above.";
+    }
+</script>
+{% endblock %}

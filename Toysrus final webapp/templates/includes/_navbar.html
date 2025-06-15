@@ -1,0 +1,552 @@
+<head>
+    <style>
+       /* Navbar Styling */
+.navbar-green {
+    background-color: #135f47;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Make navbar stay on top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure navbar stays above other elements */
+}
+
+/* Prevent Content from Overlapping with Navbar */
+body {
+    padding-top: 50px; /* Adjusted to match navbar height */
+}
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: #FFD700;
+        }
+
+        /* Menu Items */
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar-nav li {
+            position: relative;
+        }
+
+        .navbar-nav a {
+            color: white;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: #FFD700;
+        }
+.cart-icon {
+    color: white;
+    font-size: 1.2rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between icon and text */
+    margin-left: auto; /* Pushes the cart icon to the right */
+    margin-right: 20px; /* Adjust for desired spacing */
+    transition: color 0.3s;
+}
+
+.cart-icon i {
+    font-size: 1.4rem; /* Slightly larger icon */
+}
+
+.cart-icon:hover {
+    color: #FFD700;
+}
+       /* Dropdown Styling */
+
+/* Dropdown Styling */
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #5f9e7a; /* Darker green */
+    padding: 10px;
+    list-style: none;
+    border-radius: 5px;
+    top: 30px;
+    left: 0;
+    min-width: 150px;
+    z-index: 9999; /* High value to ensure it appears above all elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow for better visibility */
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px;
+    color: white; /* White text for better contrast */
+}
+
+.dropdown-menu a:hover {
+    background-color: #356b49; /* Even darker green for hover effect */
+}
+
+/* Show Dropdown */
+.show {
+    display: block;
+}
+
+/* Hamburger Menu (Visible on Laptops Only) */
+/* Hamburger Icon Animation */
+.hamburger {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Rotates into 'X' when menu is open */
+.hamburger.active {
+    transform: rotate(90deg);
+}
+
+/* Navbar Animation */
+.navbar-nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: #5f9e7a; /* Matching darker green */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show Menu Animation */
+.navbar-nav.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Show Hamburger Menu for Laptops */
+@media (min-width: 1024px) {
+    .hamburger {
+        display: block;
+    }
+
+    .navbar-nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        background-color: #438a5e; /* Matching darker green */
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        z-index: 9999; /* Ensure it appears above other elements */
+    }
+
+    .navbar-nav.show {
+        display: flex;
+    }
+}
+.navbar-center {
+    display: flex;
+    flex: 1; /* Ensures it takes up available space */
+    justify-content: center;
+}
+
+
+
+        /* Search Container (Longer & Thinner) */
+.search-container {
+    position: relative;
+    width: 320px; /* Longer by default */
+    background-color: #135f47; /* Matches navbar */
+    border: 1px solid white;
+    border-radius: 40px;
+    padding: 4px 8px; /* Thinner padding */
+    transition: width 0.3s ease, background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    justify-content: center;
+}
+/* Placeholder text color when NOT focused */
+.search-bar input::placeholder {
+    color: white;
+    opacity: 1; /* Ensures full opacity */
+}
+
+/* Default placeholder color (when not focused) */
+.search-bar input::placeholder {
+    color: white;
+    opacity: 1; /* Ensures full visibility */
+}
+
+/* Placeholder color when hovered */
+.search-container:hover input::placeholder {
+    color: #d3d3d3; /* Light grey */
+}
+
+/* Placeholder color when focused */
+.search-container.focused input::placeholder {
+    color: black;
+}
+
+/* Placeholder color when input has text (used) */
+.search-bar input:valid::placeholder {
+    color: #d3d3d3; /* Light grey */
+}
+
+/* Expand Search on Hover/Focus */
+.search-container:hover,
+.search-container.focused {
+    background-color: white;
+    border: 1px solid #007bff;
+    width: 380px; /* Expands slightly */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px; /* Less padding for thinner height */
+}
+
+/* Search Input */
+.search-bar input {
+    border: none;
+    background: transparent;
+    flex: 1;
+    outline: none;
+    font-size: 14px; /* Slightly smaller font */
+    color: white;
+    padding: 6px;
+    height: 30px; /* Makes input thinner */
+}
+
+/* Change text color when focused */
+.search-container.focused input {
+    color: black;
+}
+
+/* Search Button */
+.search-bar button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 3px;
+}
+
+/* Search Icon */
+.search-bar button i {
+    color: white;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+/* Change icon color when focused */
+.search-container.focused .search-bar button i {
+    color: #007bff;
+}
+
+/* Dropdown for search results */
+.search-dropdown {
+    display: none;
+    position: absolute;
+    top: 105%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    z-index: 10;
+    padding: 12px;
+    margin-top: -1px;
+}
+
+/* Show dropdown when search is focused */
+.search-container.focused .search-dropdown {
+    display: block;
+}
+
+/* Search Dropdown Items */
+.search-dropdown h5 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 8px;
+}
+
+.search-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.search-dropdown ul li {
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.search-dropdown ul li a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    width: 100%;
+}
+
+.search-dropdown ul li a,
+.search-dropdown ul li span {
+    color: black !important;
+}
+
+.search-dropdown ul li:hover {
+    background-color: #f1f1f1;
+}
+
+/* Delete Button */
+.btn-delete-search {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.btn-delete-search:hover {
+    color: darkred;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar-green">
+        <!-- Navbar Brand -->
+        <a class="navbar-brand" href="{{ url_for('home') }}">🌱 ToysRus</a>
+
+       <!-- Search Bar -->
+        <div class="navbar-center">
+            <div class="search-container">
+                <form action="{{ url_for('search') }}" method="get">
+                    <div class="search-bar">
+                        <input type="search" name="query" id="search-input" placeholder="Search for" autocomplete="off">
+                        <button type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                <!-- Search Dropdown -->
+                <div class="search-dropdown" id="search-dropdown">
+                    <h5>Popular Searches</h5>
+                    <ul>
+                        <li><a href="{{ url_for('search', query='lego') }}">Lego</a></li>
+                        <li><a href="{{ url_for('search', query='teddy') }}">Teddy Bear</a></li>
+                        <li><a href="{{ url_for('search', query='car') }}">Toy Car</a></li>
+                    </ul>
+                    <h5>Recent Searches</h5>
+    <ul id="recent-searches-list">
+        {% for search in searches %}
+            {% if not search.get("deleted", False) %}  <!-- Only show non-deleted searches -->
+                <li class="d-flex justify-content-between align-items-center recent-search-item" data-query="{{ search.query }}">
+                    <span>{{ search.query }}</span>
+                    <button class="btn-delete-search text-danger" title="Delete Search">&times;</button>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+                </div>
+                </div>
+            </div>
+    <!-- Cart Icon (Before Hamburger Menu) -->
+    <a href="{{ url_for('cart') }}" class="cart-icon">
+        🛒 Cart
+    </a>
+
+        <!-- Hamburger Menu Icon (For Laptops) -->
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+        <!-- Navbar Links (Initially Hidden) -->
+        <ul class="navbar-nav">
+            <li><a href="{{ url_for('all_toys') }}">🧸 All Toys</a></li>
+
+            <!-- Toys Dropdown -->
+            <li>
+                <a href="#" onclick="toggleDropdown('toysDropdown')">🧸 Categories ▼</a>
+                <ul class="dropdown-menu" id="toysDropdown">
+                    <li><a href="{{ url_for('view_category', category='dolls') }}">Dolls</a></li>
+                    <li><a href="{{ url_for('view_category', category='lego') }}">Lego</a></li>
+                    <li><a href="{{ url_for('view_category', category='stuffed_toys') }}">Stuffed Toys</a></li>
+                    <li><a href="{{ url_for('view_category', category='board_games') }}">Board Games</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('redeem_discounts_page') }}">🎟️ Redeem Discounts</a></li>
+            <li><a href="{{ url_for('create_feedback') }}">✍️ Write Feedback</a></li>  
+            <li><a href="{{ url_for('chatbot') }}">🤖 Chatbot</a></li>
+            <li><a href="{{ url_for('user_orders') }}">💳 Payment Info</a></li>
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="/thread">🔄 Trade</a>
+            </li>
+
+            <!-- 🔑 Login Dropdown -->
+            <li>
+                <a href="#" onclick="toggleDropdown('loginDropdown')">🔑 Account ▼</a>
+                <ul class="dropdown-menu" id="loginDropdown">
+                    {% if not session.get('logged_in') %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('account') }}">My Account</a></li>
+                    {% else %}
+                        {% if session.get('user_role') != 'staff' %}
+                            <li><a href="{{ url_for('account') }}">My Account</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        {% if session.get('user_role') == 'staff' %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="{{ url_for('staff_dashboard') }}">Staff Dashboard</a></li>
+                            <li><a href="{{ url_for('retrieve_users') }}">Staff: Retrieve Users</a></li>
+                            <li><a href="{{ url_for('recent_searches') }}">Recent Searches</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+       function toggleMenu() {
+    const navbar = document.querySelector(".navbar-nav");
+    const hamburger = document.querySelector(".hamburger");
+
+    navbar.classList.toggle("show");
+    hamburger.classList.toggle("active");
+
+    if (navbar.classList.contains("show")) {
+        navbar.style.display = "flex";
+        setTimeout(() => {
+            navbar.style.opacity = "1";
+            navbar.style.transform = "translateY(0)";
+        }, 10); // Delay ensures animation works correctly
+    } else {
+        navbar.style.opacity = "0";
+        navbar.style.transform = "translateY(-20px)";
+        setTimeout(() => {
+            navbar.style.display = "none";
+        }, 300); // Wait for animation to finish before hiding
+    }
+}
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle("show");
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener("click", function(event) {
+            if (!event.target.closest(".navbar-nav")) {
+                document.querySelectorAll(".dropdown-menu").forEach(menu => menu.classList.remove("show"));
+            }
+        });
+
+        // Search Bar Focus Logic
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchContainer = document.querySelector(".search-container");
+            const searchInput = document.getElementById("search-input");
+            const searchDropdown = document.getElementById("search-dropdown");
+
+            searchInput.addEventListener("focus", () => {
+                searchContainer.classList.add("focused");
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!searchContainer.contains(event.target)) {
+                    searchContainer.classList.remove("focused");
+                }
+            });
+
+            searchDropdown.addEventListener("mousedown", (event) => {
+                event.preventDefault();
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search-input");
+    const searchContainer = document.querySelector(".search-container");
+    const searchDropdown = document.getElementById("search-dropdown");
+    const recentSearchesList = document.getElementById("recent-searches-list");
+
+    // Show dropdown when focusing on search input
+    searchInput.addEventListener("focus", () => {
+        searchContainer.classList.add("focused");
+        searchDropdown.style.display = "block";  // Ensure dropdown appears
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener("click", (event) => {
+        if (!searchContainer.contains(event.target)) {
+            searchContainer.classList.remove("focused");
+            searchDropdown.style.display = "none";  // Hide dropdown
+        }
+    });
+
+    // Prevent dropdown from collapsing immediately when interacting with it
+    searchDropdown.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+    });
+
+    // Function to delete searches from dropdown (BUT NOT from database)
+    recentSearchesList.addEventListener("click", (event) => {
+        if (event.target.classList.contains("btn-delete-search")) {
+            const listItem = event.target.closest("li");
+            const query = listItem.getAttribute("data-query");
+
+            // Send AJAX request to backend to mark search as deleted
+            fetch("{{ url_for('delete_search') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `query=${encodeURIComponent(query)}`,
+            })
+            .then((response) => {
+                if (response.status === 204) {
+                    listItem.remove();  // Hide from dropdown instantly
+                } else {
+                    console.error("Failed to delete search:", response.status);
+                }
+            })
+            .catch((error) => {
+                console.error("Error deleting search:", error);
+            });
+
+            event.preventDefault(); // Prevent default behavior
+        }
+    });
+});
+    </script>
+</body>

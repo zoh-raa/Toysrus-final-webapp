@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ category.replace("_", " ").replace(" Toys", "") }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4 fw-bold text-dark">
+        {{ category.replace("_", " ").replace(" Toys", "") }}
+    </h1> <!-- Removes underscores and "Toys" -->
+
+    {% if toys %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for toy in toys %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative toy-card"
+                 style="background-color: #f8f9fa;"> <!-- Changed box color to light gray -->
+
+                <div class="toy-image-container">
+                    <img src="{{ url_for('static', filename='uploads/' + toy.get_image()) }}"
+                         class="card-img-top img-fluid"
+                         alt="{{ toy.get_name() }}"
+                         style="height: 230px; object-fit: cover;">
+                </div>
+
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title text-dark fw-bold">{{ toy.get_name() }}</h5>
+                    <p class="price text-dark fw-bold fs-5 mb-2">${{ toy.get_price() }}</p> <!-- Changed price to black -->
+
+                    <div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
+                        <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}"
+                           class="btn btn-outline-primary fw-bold flex-grow-1">View</a>
+                        <button class="btn btn-success fw-bold">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center">
+        <p class="fs-5 text-muted">No toys available in this category.</p>
+        <img src="{{ url_for('static', filename='images/empty-category.svg') }}"
+             alt="No toys available"
+             class="img-fluid mt-3"
+             style="max-width: 280px;">
+    </div>
+    {% endif %}
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .toy-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        border-radius: 15px;
+    }
+    .toy-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    .price {
+        color: #000; /* Changed price to black */
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    .btn {
+        transition: background 0.3s ease-in-out;
+    }
+    .btn-success:hover {
+        background: #28a745 !important;
+        opacity: 0.85;
+    }
+</style>
+
+{% endblock %}

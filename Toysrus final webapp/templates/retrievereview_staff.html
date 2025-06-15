@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}All Reviews (Staff){% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">All Reviews</h1>
+
+    <!-- Reviews List -->
+    <div class="reviews-container">
+        {% if reviews_list %}
+            {% for review in reviews_list %}
+                <div class="review-card mb-4 p-3 border rounded">
+                    <div class="review-header mb-3">
+                        <h5 class="mb-1">Review for: <strong>{{ review.get_toy_id() }}</strong></h5>
+                        <p class="text-muted mb-1">👤 <strong>User:</strong> {{ review.get_user_id() }}</p>
+                        <p class="text-muted mb-1">📅 <strong>Date:</strong> {{ review.get_date() }}</p>
+                        <p class="mb-1">
+                            <strong>Rating:</strong>
+                            {% for _ in range(1, review.get_rating() + 1) %}⭐{% endfor %}
+                        </p>
+                    </div>
+                    <div class="review-body">
+                        <p class="review-text">"{{ review.get_comment() }}"</p>
+                        {% if review.get_image_url() %}
+                            <div class="review-image mt-3">
+                                <img src="{{ url_for('static', filename=review.get_image_url().replace('static/', '')) }}" alt="Review Image" class="img-fluid rounded" style="max-width: 200px; max-height: 200px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="review-footer mt-3">
+                        <form action="{{ url_for('like_review', review_id=review.get_review_id()) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                {% if session.get('user_id') in review.liked_users %}
+                                    ❤️ Unlike
+                                {% else %}
+                                    🤍 Like
+                                {% endif %}
+                            </button>
+                            <span class="likes-count">{{ review.get_likes() }} Likes</span>
+                        </form>
+
+                        <!-- Delete Button (For Staff) -->
+                        <form action="{{ url_for('delete_review_staff', review_id=review.get_review_id()) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger ml-2">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">No reviews found.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

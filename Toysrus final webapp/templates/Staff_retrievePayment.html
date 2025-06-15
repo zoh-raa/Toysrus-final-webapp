@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Manage Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Order Management</h2>
+
+    {% if order_history %}
+        <ul class="list-group">
+            {% for order in order_history %}
+                <li class="list-group-item">
+                    <strong>Name:</strong> {{ order.get('name', 'N/A') }}<br>
+                    <strong>Email:</strong> {{ order.get('email', 'N/A') }}<br>
+                    <strong>Address:</strong> {{ order.get('address', 'N/A') }}<br>
+                    <strong>Total Paid:</strong> ${{ "%.2f"|format(order.get('total_after_discount', 0)) }}<br>
+                    <strong>Order Date:</strong> {{ order.get('order_date', 'N/A') }}<br>
+                    <strong>Items:</strong>
+                    <ul>
+                        {% for item in order.get('cart_items', []) %}
+                            <li>{{ item.name }} (x{{ item.quantity }}) - ${{ "%.2f"|format(item.total_price) }}</li>
+                        {% endfor %}
+                    </ul>
+                    <!-- Staff Only: Edit/Delete Buttons -->
+                    <a href="{{ url_for('edit_order', order_id=order.get('id')) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="{{ url_for('delete_order', order_id=order.get('id')) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No orders found.</p>
+    {% endif %}
+</div>
+{% endblock %}

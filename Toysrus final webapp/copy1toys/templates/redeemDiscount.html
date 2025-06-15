@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}ToysRUs - Discounts List{% endblock %}
+{% block content %}
+<h1 class="display-4">Discounts List</h1>
+<div>
+  {% if count == 0 %}
+  <p>There are no discounts.</p>
+  {% elif count == 1 %}
+  <p>There is 1 discount.</p>
+  {% else %}
+  <p>There are {{ count }} discounts.</p>
+  {% endif %}
+</div>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Percentage</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for discount in discounts_list %}
+    <tr>
+        <td>{{ discount.get_discount_id() }}</td>
+        <td>{{ discount.get_name() }}</td>
+        <td>{{ discount.get_percentage() }}%</td>
+        <td>{{ discount.get_startdate() }}</td>
+        <td>{{ discount.get_enddate() }}</td>
+        <td>
+            {% if discount.get_enddate() < today %}
+                <span class="text-danger">Expired</span>
+            {% elif discount.get_discount_id() in redeemed_discounts %}
+                <span class="text-success">Redeemed</span>
+            {% else %}
+                <span class="text-primary">Available</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if discount.get_enddate() < today %}
+                <button class="btn btn-danger" disabled>Expired</button>
+            {% elif discount.get_discount_id() in redeemed_discounts %}
+                <button class="btn btn-secondary" disabled>Redeemed</button>
+            {% else %}
+                <form action="{{ url_for('redeem_discount', discount_id=discount.get_discount_id()) }}" method="POST">
+                    <button type="submit" class="btn btn-primary">Redeem</button>
+                </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

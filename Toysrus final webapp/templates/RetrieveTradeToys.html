@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Retrieve Toys{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Retrieve Trade Toys</h1>
+
+<div>
+  {% if count == 0 %}
+    <p>There are no toys available in the database.</p>
+  {% elif count == 1 %}
+    <p>There is 1 toy available in the database.</p>
+  {% else %}
+    <p>There are {{ count }} toys available in the database.</p>
+  {% endif %}
+</div>
+
+<!-- Only display the table if there are toys -->
+{% if count > 0 %}
+  <div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Toy ID</th>
+          <th>User ID</th>
+          <th>Toy Name</th>
+          <th>Value</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for toy in toy_list %}
+          <tr>
+            <td>{{ toy.get_id() }}</td>
+            <td>{{ toy.get_user_name() }}</td>
+            <td>{{ toy.get_name() }}</td>
+            <td>{{ toy.get_price() }}</td>
+            <td>{{ toy.get_remarks() }}</td>
+            <td><a href="/UpdateTradeToy/{{toy.get_id()}}" class="btn btn-warning">Update</a></td>
+            <td>
+              <form action="{{url_for('delete_trade_toys', id=toy.get_id())}}" method="POST">
+                <!-- Button to Open the Modal -->
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{toy.get_id()}}">
+                  Delete
+                </button>
+
+                <!-- The Modal -->
+                <div class="modal" id="myModal_{{toy.get_id()}}">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">Delete Confirmation</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                        Are you sure you want to delete {{toy.get_name()}}?
+                      </div>
+
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <input type="submit" value="Delete" class="btn btn-danger">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p>No toys found in the database.</p>
+{% endif %}
+
+{% endblock %}

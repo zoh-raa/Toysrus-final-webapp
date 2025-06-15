@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My App{% endblock %}</title>
+
+    <!-- Bootstrap 5.1.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            height: 100%;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container-fluid {
+            max-width: 1200px;
+            margin: auto;
+            padding-top: 50px;
+            flex-grow: 1;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        footer {
+            background-color: #135f47;
+            color: white;
+            padding: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Breadcrumb Styling */
+        /* Make Breadcrumb Fixed Below Navbar */
+.breadcrumb-container {
+    position: fixed;
+    top: 80px; /* Adjusted to be below the navbar */
+    width: 100%;
+    background: #d4a017; /* Dark yellow */
+    border-bottom: 2px solid #b8860b; /* Slightly darker yellow border */
+    padding: 10px 20px;
+    z-index: 999; /* Ensures it stays on top of other elements */
+}
+
+/* Prevent Content from Overlapping Breadcrumb */
+.container-fluid {
+    padding-top: 100px; /* Adjusted for navbar + breadcrumb height */
+}
+
+
+        .breadcrumb {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb li {
+            display: inline;
+            font-size: 14px;
+            color: white; /* Ensure good contrast */
+        }
+
+        .breadcrumb li + li:before {
+            content: "›"; /* Google-style separator */
+            padding: 0 8px;
+            color: white;
+        }
+
+        .breadcrumb li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .breadcrumb li a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar Section -->
+{% block navbar %}
+    {% if session.get('user_role') == 'staff' %}
+        {% include 'includes/_staff_navbar.html' %}
+    {% else %}
+        {% include 'includes/_navbar.html' %}
+    {% endif %}
+{% endblock %}
+
+<!-- Breadcrumb Container (Hidden for Staff) -->
+{% if session.get('user_role') != 'staff' %}
+    <div class="breadcrumb-container">
+        <ul id="breadcrumb" class="breadcrumb"></ul>
+    </div>
+{% endif %}
+
+<!-- Main Content Section -->
+<div class="container-fluid">
+  {% block content %}
+  {% endblock %}
+</div>
+
+<!-- Footer Section -->
+<footer style="margin-top: 40px;">
+  <p>&copy; 2025 My App. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap 5 JS, Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+
+<!-- JavaScript for Breadcrumbs (Hidden for Staff) -->
+{% if session.get('user_role') != 'staff' %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const breadcrumbContainer = document.getElementById("breadcrumb");
+
+        // Check if the user is logging out
+        if (window.location.pathname.includes("logout")) {
+            sessionStorage.removeItem("breadcrumbTrail");
+        }
+
+        // Reset breadcrumb trail on a hard refresh (new session)
+        if (!sessionStorage.getItem("breadcrumbInitialized")) {
+            sessionStorage.removeItem("breadcrumbTrail");
+            sessionStorage.setItem("breadcrumbInitialized", "true");
+        }
+
+        // Get current page name from URL or document title
+        let pageName = document.title.trim() || window.location.pathname.split("/").pop();
+        let pageURL = window.location.pathname;
+
+        // If the user is on the Home page, clear the breadcrumb history
+        if (pageURL === "/" || pageURL === "/index.html") {
+            sessionStorage.removeItem("breadcrumbTrail");
+        }
+
+        // Retrieve existing breadcrumb trail or start fresh
+        let breadcrumbTrail = JSON.parse(sessionStorage.getItem("breadcrumbTrail")) || [];
+
+        // List of unwanted page names
+        const excludedPages = ["Welcome to ToysRUs", "Homepage"];
+
+        // Ensure the page is relevant and not already in the breadcrumb list
+        if (!excludedPages.includes(pageName) && !breadcrumbTrail.some(item => item.url === pageURL)) {
+            breadcrumbTrail.push({ name: pageName.replace(/_/g, ' '), url: pageURL });
+        }
+
+        // Save updated breadcrumbs in sessionStorage
+        sessionStorage.setItem("breadcrumbTrail", JSON.stringify(breadcrumbTrail));
+
+        // Generate breadcrumb HTML
+        let breadcrumbHTML = `<li><a href="/" onclick="resetBreadcrumb()">Home</a></li>`;
+
+        breadcrumbTrail.forEach((item, index) => {
+            if (index === breadcrumbTrail.length - 1) {
+                breadcrumbHTML += `<li>${item.name}</li>`; // Last item is plain text
+            } else {
+                breadcrumbHTML += `<li><a href="${item.url}">${item.name}</a></li>`;
+            }
+        });
+
+        breadcrumbContainer.innerHTML = breadcrumbHTML;
+    });
+
+    // Function to reset breadcrumb when user clicks "Home"
+    function resetBreadcrumb() {
+        sessionStorage.removeItem("breadcrumbTrail");
+        sessionStorage.setItem("breadcrumbInitialized", "true");
+    }
+
+    // Ensure breadcrumb resets when logging out
+    document.addEventListener("click", function (event) {
+        if (event.target.matches(".logout-button")) {
+            sessionStorage.removeItem("breadcrumbTrail");
+            sessionStorage.setItem("breadcrumbInitialized", "true");
+        }
+    });
+</script>
+{% endif %}
+
+{% block scripts %}
+{% endblock %}

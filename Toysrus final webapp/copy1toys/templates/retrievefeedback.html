@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Library Loan System - Retrieve Feedback{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Retrieve Feedback</h1>
+<a href="{{ url_for('export_feedbacks') }}" class="btn btn-success mb-4">Export Feedback to CSV</a>
+
+<!-- Search Form -->
+<form method="GET" action="/retrieveFeedback" class="mb-4">
+  <div class="form-group">
+    <input type="text" name="search_query" class="form-control" placeholder="Search Feedback" value="{{ search_query }}">
+  </div>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<!-- Satisfaction Filter -->
+<form method="GET" action="/retrieveFeedback" class="mb-4">
+  <div class="form-group">
+    <select name="satisfactory_filter" class="form-control">
+      <option value="">Filter by Satisfaction</option>
+      <option value="1" {% if satisfactory_filter == "1" %}selected{% endif %}>1</option>
+      <option value="2" {% if satisfactory_filter == "2" %}selected{% endif %}>2</option>
+      <option value="3" {% if satisfactory_filter == "3" %}selected{% endif %}>3</option>
+      <option value="4" {% if satisfactory_filter == "4" %}selected{% endif %}>4</option>
+      <option value="5" {% if satisfactory_filter == "5" %}selected{% endif %}>5</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<div>
+  {% if count == 0 %}
+  <p class="no-feedbacks">There is no feedback.</p>
+  {% elif count == 1 %}
+  <p>There is 1 feedback.</p>
+  {% else %}
+  <p>There are {{ count }} feedback entries.</p>
+  {% endif %}
+</div>
+
+<!-- Feedback Table -->
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Satisfaction</th>
+        <th>Feedback</th>
+        <th>Date Posted</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for feedback in feedbacks_list %}
+      <tr>
+        <td>{{ feedback.get_first_name() }}</td>  <!-- ✅ Correct -->
+<td>{{ feedback.get_last_name() }}</td>   <!-- ✅ Correct -->
+<td>{{ feedback.get_email() }}</td>       <!-- ✅ Correct -->
+ <!-- ✅ Corrected -->
+        <td>
+          {% for i in range(feedback.satisfactory) %}
+            &#9733;
+          {% endfor %}
+        </td>
+        <td>{{ feedback.improvements }}</td>
+        <td>{{ feedback.get_date_posted() }}</td>  <!-- ✅ Use getter method -->
+
+      </tr>
+      {% endfor %}
+    </tbody>
+    
+  </table>
+</div>
+
+{% endblock %}

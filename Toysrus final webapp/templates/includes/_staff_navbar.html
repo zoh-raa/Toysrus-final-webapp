@@ -1,0 +1,205 @@
+<head>
+    <style>
+/* General Navbar Styling */
+.navbar {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    min-height: 50px;
+}
+
+/* Hamburger Icon */
+.hamburger {
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+    background: none;
+    border: none;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #333;
+    overflow-x: hidden;
+    transition: width 0.3s ease-in-out;
+    padding-top: 60px;
+    z-index: 2000; /* Ensures it overlays content */
+}
+
+/* Sidebar Links */
+.sidebar a {
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+    display: block;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    background-color: #575757;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 25px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Dropdown Button */
+.dropdown-btn {
+    font-size: 18px;
+    color: white;
+    padding: 12px 20px;
+    text-align: left;
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dropdown-btn:hover {
+    background-color: #575757;
+}
+
+/* Fix Dropdown Position */
+.dropdown-container {
+    display: none;
+    background-color: #444;
+    padding-left: 15px;
+    transition: max-height 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden; /* Smooth transition effect */
+}
+
+/* When Opened */
+.dropdown-container.show {
+    display: block;
+    max-height: 300px; /* Allows transition effect */
+}
+
+
+.sidebar-open .dropdown-container {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Smooth Animation */
+body.sidebar-open {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Logout Button */
+.logout-btn {
+    position: absolute;
+    right: 150px;
+    background-color: red;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: darkred;
+}
+
+/* Adjust Body Padding */
+body {
+    padding-top: 60px;
+}
+    </style>
+</head>
+
+<body>
+
+<!-- Navbar with Hamburger Button -->
+<nav class="navbar">
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    <button class="hamburger" onclick="toggleNav()">☰</button>
+    <a class="navbar-brand fw-bold" href="{{ url_for('staff_dashboard') }}">Staff Dashboard</a>
+</nav>
+
+<!-- Sidebar Navigation -->
+<div id="sidebarMenu" class="sidebar">
+    <span class="close-btn" onclick="toggleNav()">×</span>
+
+    <a href="{{ url_for('listdiscounts') }}">Manage Discounts</a>
+    <a href="{{ url_for('create_discount') }}">Create Discount</a>
+    <a href="{{ url_for('retrieve_users') }}">Manage Users</a>
+    <a href="{{ url_for('recent_searches') }}">Recent Searches</a>
+
+    <!-- Content Management Dropdown -->
+    <button class="dropdown-btn" onclick="toggleDropdown()">Content Management ▼</button>
+    <div class="dropdown-container" id="dropdownContent">
+        <a href="{{ url_for('retrieve_reviews_staff') }}">View Reviews</a>
+        <a href="{{ url_for('retrieve_feedbacks')}}">View Feedback</a>
+    </div>
+
+    <a href="{{ url_for('retrieve_trade_toys') }}">Retrieve Toy</a>
+    <a href="{{ url_for('retrieve_toys') }}">Toy Inventory</a>
+    <a href="{{ url_for('add_toy') }}">Create Toy</a>
+
+    <a href="{{ url_for('user_orders') }}">Payment Info</a>
+    <a href="{{ url_for('staff_orders') }}">Manage Orders</a>
+</div>
+
+<!-- JavaScript for Sidebar and Dropdown -->
+<script>
+let sidebarOpen = false;
+
+function toggleNav() {
+    let sidebar = document.getElementById("sidebarMenu");
+
+    if (sidebarOpen) {
+        sidebar.style.width = "0";
+        document.body.classList.remove("sidebar-open");
+    } else {
+        sidebar.style.width = "250px";
+        document.body.classList.add("sidebar-open");
+    }
+
+    sidebarOpen = !sidebarOpen;
+}
+
+function toggleDropdown() {
+    let dropdown = document.getElementById("dropdownContent");
+    dropdown.classList.toggle("show"); // ✅ Toggle class to make it work smoothly
+}
+
+
+// Close sidebar when clicking outside
+document.addEventListener('click', function(event) {
+    let sidebar = document.getElementById("sidebarMenu");
+    let hamburger = document.querySelector(".hamburger");
+
+    if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+        sidebar.style.width = "0";
+        document.body.classList.remove("sidebar-open");
+        sidebarOpen = false;
+    }
+});
+</script>
+
+</body>

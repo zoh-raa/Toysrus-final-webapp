@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Update User{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card p-5 shadow-sm rounded" style="max-width: 750px; width: 100%; background-color: #f9f9f9;">
+        <h2 class="text-center fw-bold">Update User Account</h2>
+        <p class="text-center text-muted">Modify your details below. Fields left blank will remain unchanged.</p>
+
+        <form method="POST" action="">
+            <div class="mb-3">
+                {{ render_field(form.first_name, class="form-control", placeholder="First Name (Optional)") }}
+            </div>
+            <div class="mb-3">
+                {{ render_field(form.last_name, class="form-control", placeholder="Last Name (Optional)") }}
+            </div>
+            <div class="mb-3">
+                {{ render_field(form.email, class="form-control", placeholder="Email (Optional)") }}
+            </div>
+
+            <!-- Change Password Button -->
+            <div class="mb-3 text-center">
+                <a href="{{ url_for('password_request') }}" class="btn btn-warning w-100">Change Password</a>
+            </div>
+
+            <div class="mb-3">
+                {{ render_field(form.contact_number, class="form-control", placeholder="Contact Number (Optional)") }}
+            </div>
+            <div class="mb-3">
+                {{ render_field(form.address, class="form-control", placeholder="Address (Optional)") }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Update Account</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

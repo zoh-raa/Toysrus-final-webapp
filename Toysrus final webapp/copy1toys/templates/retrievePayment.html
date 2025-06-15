@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Retrieve Payment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Order History</h2>
+
+    {% if order_history %}
+        <ul class="list-group">
+            {% for order in order_history %}
+                <li class="list-group-item">
+                    <strong>Name:</strong> {{ order.get('name', 'N/A') }}<br>
+                    <strong>Email:</strong> {{ order.get('email', 'N/A') }}<br>
+                    <strong>Address:</strong> {{ order.get('address', 'N/A') }}<br>
+                    <strong>Total Paid:</strong> ${{ "%.2f"|format(order.get('total_price', 0)) }}<br>
+                    <strong>Order Date:</strong> {{ order.get('date', 'N/A') }}<br>
+                    <strong>Items:</strong>
+                    <ul>
+                        {% for item in order.get('cart_items', []) %}
+                            <li>{{ item.name }} (x{{ item.quantity }}) - ${{ "%.2f"|format(item.total_price) }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No past orders found.</p>
+    {% endif %}
+</div>
+{% endblock %}

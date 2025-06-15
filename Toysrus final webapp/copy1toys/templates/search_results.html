@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Search Results for "{{ query }}"</h1>
+    {% if results %}
+    <div class="row">
+        {% for toy in results %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ toy.get_image() }}" class="card-img-top" alt="{{ toy.get_name() }}" style="height: auto; max-height: 200px; object-fit: contain;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ toy.get_name() }}</h5>
+                    <p class="card-text text-truncate">{{ toy.get_description() }}</p>
+                    <p class="card-text"><strong>${{ toy.get_price() }}</strong></p>
+                    <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No results found for "{{ query }}".</p>
+    {% endif %}
+</div>
+{% endblock %}

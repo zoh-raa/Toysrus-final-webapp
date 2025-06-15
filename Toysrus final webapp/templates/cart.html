@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Shopping Cart</h1>
+
+    {% if cart_items %}
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>${{ "%.2f"|format(item.price) }}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary update-cart" data-name="{{ item.name }}" data-action="decrease">-</button>
+                    <span>{{ item.quantity }}</span>
+                    <button class="btn btn-sm btn-outline-secondary update-cart" data-name="{{ item.name }}" data-action="increase">+</button>
+                </td>
+                <td>${{ "%.2f"|format(item.total_price) }}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger update-cart" data-name="{{ item.name }}" data-action="remove">Remove</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-right">
+        <a href="{{ url_for('checkout') }}" class="btn btn-success">Proceed to Checkout</a>
+    </div>
+    {% else %}
+    <p class="text-center">Your cart is empty. <a href="{{ url_for('catalog') }}">Start shopping</a>.</p>
+    {% endif %}
+</div>
+
+<script>
+    document.querySelectorAll('.update-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            let itemName = this.getAttribute("data-name");
+            let action = this.getAttribute("data-action");
+
+            fetch("{{ url_for('update_cart') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: action, name: itemName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+</script>
+{% endblock %}

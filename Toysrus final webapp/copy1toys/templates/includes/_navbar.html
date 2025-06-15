@@ -1,0 +1,293 @@
+<head>
+    <style>
+        /* Navbar Styling */
+        .navbar-green {
+            background-color: #135f47;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: #FFD700;
+        }
+
+        /* Menu Items */
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar-nav li {
+            position: relative;
+        }
+
+        .navbar-nav a {
+            color: white;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav a:hover {
+            color: #FFD700;
+        }
+
+        /* Dropdown Styling */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: #135f47;
+            padding: 10px;
+            list-style: none;
+            border-radius: 5px;
+            top: 30px;
+            left: 0;
+            min-width: 150px;
+            z-index: 10;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 8px;
+            color: white;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #198754;
+        }
+
+        /* Show Dropdown */
+        .show {
+            display: block;
+        }
+
+        /* Hamburger Menu (Visible on Laptops Only) */
+        .hamburger {
+            display: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Show Hamburger Menu for Laptops */
+        @media (min-width: 1024px) {
+            .hamburger {
+                display: block;
+            }
+
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #135f47;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            }
+
+            .navbar-nav.show {
+                display: flex;
+            }
+        }
+
+        /* Search Bar Styling */
+        .search-container {
+            position: relative;
+            width: 300px;
+            transition: width 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            background-color: #f0f0f0;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            border-radius: 30px 30px 0 0;
+            padding: 5px 15px;
+            box-shadow: none;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            flex: 1;
+            outline: none;
+            font-size: 16px;
+            color: white;
+            padding: 5px;
+        }
+
+        .search-bar input:focus {
+            color: black;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .search-bar button {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .search-bar button i {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            z-index: 10;
+            padding: 10px;
+            margin-top: -1px;
+        }
+
+        .search-container.focused .search-dropdown {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar-green">
+        <!-- Navbar Brand -->
+        <a class="navbar-brand" href="{{ url_for('home') }}">🌱 ToysRus</a>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form action="{{ url_for('search') }}" method="get">
+                <div class="search-bar">
+                    <input type="search" name="query" id="search-input" placeholder="Search for" autocomplete="off">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+            <!-- Search Dropdown -->
+            <div class="search-dropdown" id="search-dropdown">
+                <h5>Popular Searches</h5>
+                <ul>
+                    <li><a href="{{ url_for('search', query='lego') }}">Lego</a></li>
+                    <li><a href="{{ url_for('search', query='teddy') }}">Teddy Bear</a></li>
+                    <li><a href="{{ url_for('search', query='car') }}">Toy Car</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Hamburger Menu Icon (For Laptops) -->
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+        <!-- Navbar Links (Initially Hidden) -->
+        <ul class="navbar-nav">
+            <li><a href="{{ url_for('all_toys') }}">🧸 All Toys</a></li>
+
+            <!-- Toys Dropdown -->
+            <li>
+                <a href="#" onclick="toggleDropdown('toysDropdown')">🧸 Categories ▼</a>
+                <ul class="dropdown-menu" id="toysDropdown">
+                    <li><a href="{{ url_for('view_category', category='dolls') }}">Dolls</a></li>
+                    <li><a href="{{ url_for('view_category', category='lego') }}">Lego</a></li>
+                    <li><a href="{{ url_for('view_category', category='stuffed_toys') }}">Stuffed Toys</a></li>
+                    <li><a href="{{ url_for('view_category', category='board_games') }}">Board Games</a></li>
+                </ul>
+            </li>
+
+            <!-- Discounts Dropdown -->
+            <li>
+                <a href="#" onclick="toggleDropdown('discountsDropdown')">💰 Manage Discounts ▼</a>
+                <ul class="dropdown-menu" id="discountsDropdown">
+                    <li><a href="{{ url_for('listdiscounts') }}">Discount List</a></li>
+                    <li><a href="{{ url_for('create_discount') }}">Create Discount</a></li>
+                </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('retrieve_reviews') }}">⭐ View Reviews</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('retrieve_feedbacks') }}">📝 View Feedback</a></li>
+            <li><a href="{{ url_for('chatbot') }}">🤖 Chatbot</a></li>
+            <li><a href="{{ url_for('retrieve_payment') }}">💳 Payment Info</a></li>
+
+            <!-- 🔑 Login Dropdown -->
+            <li>
+                <a href="#" onclick="toggleDropdown('loginDropdown')">🔑 Account ▼</a>
+                <ul class="dropdown-menu" id="loginDropdown">
+                    {% if not session.get('logged_in') %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('account') }}">My Account</a></li>
+                    {% else %}
+                        {% if session.get('user_role') != 'staff' %}
+                            <li><a href="{{ url_for('account') }}">My Account</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        {% if session.get('user_role') == 'staff' %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="{{ url_for('staff_dashboard') }}">Staff Dashboard</a></li>
+                            <li><a href="{{ url_for('retrieve_users') }}">Staff: Retrieve Users</a></li>
+                            <li><a href="{{ url_for('recent_searches') }}">Recent Searches</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector(".navbar-nav").classList.toggle("show");
+        }
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle("show");
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener("click", function(event) {
+            if (!event.target.closest(".navbar-nav")) {
+                document.querySelectorAll(".dropdown-menu").forEach(menu => menu.classList.remove("show"));
+            }
+        });
+
+        // Search Bar Focus Logic
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchContainer = document.querySelector(".search-container");
+            const searchInput = document.getElementById("search-input");
+            const searchDropdown = document.getElementById("search-dropdown");
+
+            searchInput.addEventListener("focus", () => {
+                searchContainer.classList.add("focused");
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!searchContainer.contains(event.target)) {
+                    searchContainer.classList.remove("focused");
+                }
+            });
+
+            searchDropdown.addEventListener("mousedown", (event) => {
+                event.preventDefault();
+            });
+        });
+    </script>
+</body>

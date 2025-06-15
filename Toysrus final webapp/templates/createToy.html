@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Add a New Toy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="fw-bold text-dark text-center">🧸 Add a New Toy</h1>
+    <p class="text-center text-muted">Fill in the details below to add a new toy to the collection.</p>
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 mx-auto" style="max-width: 750px; background: #f8f9fa;">
+        <form method="POST" action="{{ url_for('add_toy') }}" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.name.label(class="form-label fw-semibold") }}
+                {{ form.name(class="form-control rounded-3") }}
+                {% for error in form.name.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.description.label(class="form-label fw-semibold") }}
+                {{ form.description(class="form-control rounded-3", rows=5) }} <!-- Increased size -->
+                {% for error in form.description.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+    {{ form.price.label(class="form-label fw-semibold") }}
+    <input type="text" name="price" id="price" class="form-control rounded-3"
+       required onblur="formatPrice(this)">
+    {% for error in form.price.errors %}
+        <div class="text-danger small">{{ error }}</div>
+    {% endfor %}
+</div>
+
+            <div class="mb-3">
+                {{ form.category.label(class="form-label fw-semibold") }}
+                {{ form.category(class="form-control rounded-3") }}
+                {% for error in form.category.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.image.label(class="form-label fw-semibold") }}
+                <input type="file" name="image" id="image" class="form-control rounded-3" accept="image/*" required onchange="previewImage(event)">
+                {% for error in form.image.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Image Preview -->
+            <div class="text-center mb-3">
+                <img id="image-preview" src="#" alt="Image Preview" class="img-fluid rounded-3 shadow-sm d-none" style="max-width: 250px;">
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">➕ Add Toy</button>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript Enhancements -->
+<script>
+    function formatPrice(input) {
+        let value = parseFloat(input.value);
+        if (!isNaN(value)) {
+            input.value = value.toFixed(2); // Ensures display in 2dp
+        }
+    }
+    // Image Preview Functionality
+    function previewImage(event) {
+        const preview = document.getElementById("image-preview");
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+
+<!-- Custom Styling -->
+<style>
+    .btn-lg {
+        border-radius: 10px;
+        font-size: 1.2rem;
+    }
+    .shadow-sm {
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .rounded-3 {
+        border-radius: 12px;
+    }
+    .card {
+        max-width: 750px !important; /* Increased container width */
+    }
+</style>
+
+{% endblock %}

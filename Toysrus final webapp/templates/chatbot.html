@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}ToysRUs - Chatbot{% endblock %}
+
+{% block content %}
+<style>
+    .chatbot-container {
+        width: 400px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        margin: 50px auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chatbot-header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .chatbot-body {
+        padding: 15px;
+        height: 350px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chatbot-message {
+        max-width: 80%;
+        padding: 12px;
+        border-radius: 15px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* User messages (align right, blue bubble) */
+    .user-message {
+        background-color: #007bff;
+        color: white;
+        align-self: flex-end;
+    }
+
+    /* Bot messages (align left, grey bubble) */
+    .bot-message {
+        background-color: #f1f1f1;
+        color: black;
+        align-self: flex-start;
+    }
+
+    /* Chatbot options */
+    .chatbot-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .chatbot-options button {
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 14px;
+    }
+
+    .chatbot-options button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Chat input */
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-top: 1px solid #ddd;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .chatbot-input button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .chatbot-input button:hover {
+        background-color: #0056b3;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="chatbot-container">
+    <div class="chatbot-header">
+        ToysRUs Chatbot
+    </div>
+    <div class="chatbot-body" id="chatbot-body">
+        <div class="chatbot-message bot-message">
+            Hey! I'm ToysRUs's chatbot! How can I help you today? 😊
+        </div>
+        <div class="chatbot-options">
+            <button onclick="sendMessage('Send an email to customer service')">Send an email to customer service</button>
+            <button onclick="sendMessage('Inquire about returns, refunds, and exchanges')">Returns, refunds & exchanges</button>
+            <button onclick="sendMessage('Inquire about the Star Card Program')">Star Card Program details</button>
+            <button onclick="sendMessage('Where can I use my promo code?')">Where to use promo codes?</button>
+        </div>
+    </div>
+    <div class="chatbot-input">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendUserMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage(message) {
+        const chatbotBody = document.getElementById('chatbot-body');
+
+        // Create user message bubble
+        const userMessage = document.createElement('div');
+        userMessage.className = 'chatbot-message user-message';
+        userMessage.innerHTML = `<p><strong>You:</strong> ${message}</p>`;
+        chatbotBody.appendChild(userMessage);
+
+        // Send request to Flask backend
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message }),
+        });
+
+        const data = await response.json();
+
+        // Create bot response bubble
+        const botResponse = document.createElement('div');
+        botResponse.className = 'chatbot-message bot-message';
+        botResponse.innerHTML = `<p><strong>Bot:</strong> ${data.response}</p>`;
+        chatbotBody.appendChild(botResponse);
+
+        // Auto-scroll to the bottom
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+
+    function sendUserMessage() {
+        const userInput = document.getElementById('user-input');
+        const message = userInput.value.trim();
+        if (message) {
+            sendMessage(message);
+            userInput.value = ''; // Clear input field
+        }
+    }
+</script>
+
+{% endblock %}

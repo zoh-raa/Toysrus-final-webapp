@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Toy Catalog{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Toy Catalog</h1>
+    {% if toys %}
+    <div class="row">
+        {% for toy in toys %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ toy.get_image() }}" class="card-img-top" alt="{{ toy.get_name() }}" style="height: auto; max-height: 200px; width: auto; object-fit: contain;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ toy.get_name() }}</h5>
+                    <p class="card-text"><strong>${{ toy.get_price() }}</strong></p>
+                <div class="d-flex flex-column align-items-center gap-2">
+                    <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}" class="btn btn-primary btn-sm w-100">View Details</a>
+                    <button class="btn btn-success btn-sm w-100 add-to-cart"
+                        data-name="{{ toy.get_name() }}"
+                        data-price="{{ toy.get_price() }}">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No toys available. Add some toys to see them here!</p>
+    {% endif %}
+</div>
+
+<!-- Floating Notification -->
+<div id="cart-notification" class="alert alert-success position-fixed top-0 start-50 translate-middle-x p-3 shadow-lg rounded d-none"
+     style="z-index: 1050; min-width: 300px; text-align: center;">
+    Item added to cart successfully!
+</div>
+
+
+<script>
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            let itemName = this.getAttribute("data-name");
+            let itemPrice = this.getAttribute("data-price");
+
+            fetch("{{ url_for('add_to_cart') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: itemName, price: itemPrice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showNotification(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+
+function showNotification(message) {
+    let notification = document.getElementById("cart-notification");
+
+    // Update the message
+    notification.innerText = message;
+
+    // Show the notification
+    notification.classList.remove("d-none");
+
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.classList.add("d-none");
+    }, 3000);
+}
+
+</script>
+{% endblock %}

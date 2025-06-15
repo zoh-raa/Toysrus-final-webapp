@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">All Feedback</h1>
+
+    <div class="text-right mb-3">
+      <a href="{{ url_for('export_feedbacks') }}" class="btn btn-success">
+          📥 Export Feedback as CSV
+      </a>
+  </div>
+  
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Satisfaction</th>
+                <th>Feedback</th>
+                <th>Sentiment</th>
+                <th>Date</th>
+                <th>Action</th> <!-- ✅ New Column for Delete Button -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for feedback in feedbacks_list %}
+            <tr>
+                <td>User ID: {{ feedback.get_user_id() }}</td>
+                <td>{{ feedback.satisfactory }}/5</td>
+                <td>{{ feedback.improvements }}</td>
+                <td>
+                    <span class="badge 
+                        {% if feedback.sentiment == 'Positive' %}badge-success
+                        {% elif feedback.sentiment == 'Negative' %}badge-danger
+                        {% else %}badge-secondary{% endif %}">
+                        {{ feedback.sentiment }}
+                    </span>
+                </td>
+                <td>{{ feedback.date_posted }}</td>
+                <td>
+              
+                    <form method="POST" action="{{ url_for('delete_feedback', id=feedback.get_feedback_id()) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                    </form>
+                    
+                    
+
+
+                        
+      
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

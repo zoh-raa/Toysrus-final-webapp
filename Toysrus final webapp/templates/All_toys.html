@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}All Toys{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">All Toys</h1>
+    {% if toys %}
+    <div class="row">
+        {% for toy in toys %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ toy.get_image() }}" class="card-img-top" alt="{{ toy.get_name() }}" style="height: auto; max-height: 200px; width: auto; object-fit: contain;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ toy.get_name() }}</h5>
+                    <p class="card-text text-truncate">{{ toy.get_description() }}</p>
+                    <p class="card-text"><strong>${{ "%.2f"|format(toy.get_price()) }}</strong></p>
+                    <a href="{{ url_for('view_toy', id=toy.get_toy_id()) }}" class="btn btn-primary btn-sm">View Details</a>
+                    <button class="btn btn-success btn-sm mt-2 add-to-cart"
+                        data-name="{{ toy.get_name() }}"
+                        data-price="{{ toy.get_price() }}">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No toys available.</p>
+    {% endif %}
+</div>
+
+<!-- Floating Notification -->
+<div id="cart-notification" class="alert alert-success position-fixed bottom-0 end-0 m-3 d-none" style="z-index: 1050;">
+    Item added to cart successfully!
+</div>
+
+<script>
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            let itemName = this.getAttribute("data-name");
+            let itemPrice = this.getAttribute("data-price");
+
+            fetch("{{ url_for('add_to_cart') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: itemName, price: itemPrice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showNotification(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+
+    function showNotification(message) {
+        let notification = document.getElementById("cart-notification");
+        notification.innerText = message;
+        notification.classList.remove("d-none");
+        setTimeout(() => notification.classList.add("d-none"), 3000);
+    }
+</script>
+{% endblock %}

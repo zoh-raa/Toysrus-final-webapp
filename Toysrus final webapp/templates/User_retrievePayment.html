@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Your Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Your Orders</h2>
+
+    {% if user_orders %}
+        <ul class="list-group">
+            {% for order in user_orders %}
+                <li class="list-group-item">
+                    <strong>Order Date:</strong> {{ order.get('order_date', 'N/A') }}<br>
+                    <strong>Total Paid:</strong> ${{ "%.2f"|format(order.get('total_after_discount', 0)) }}<br>
+                    <strong>Items:</strong>
+                    <ul>
+                        {% for item in order.get('cart_items', []) %}
+                            <li>{{ item.name }} (x{{ item.quantity }}) - ${{ "%.2f"|format(item.total_price) }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no past orders.</p>
+    {% endif %}
+</div>
+{% endblock %}

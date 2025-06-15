@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Your Review</h2>
+
+{% if review %}
+<form method="POST" enctype="multipart/form-data">
+    <label for="rating">Rating (1-5):</label>
+    <input type="number" name="rating" value="{{ review.get_rating() }}" min="1" max="5" required>
+
+    <label for="comment">Comment:</label>
+    <textarea name="comment" required>{{ review.get_comment() }}</textarea>
+
+    <!-- ✅ Add Date Input -->
+    <label for="date">Review Date:</label>
+    <input type="date" name="date" required value="{{ review.get_date() }}">
+
+    <label for="image">Update Image (Optional):</label>
+    <input type="file" name="image" accept="image/*">
+
+    {% if review.get_image_url() %}
+        <p>Current Image:</p>
+        <img src="{{ url_for('static', filename=review.get_image_url().replace('static/', '')) }}" 
+             alt="Review Image" width="150">
+    {% endif %}
+
+    <button type="submit">Update Review</button>
+</form>
+
+<!-- Delete Review Button -->
+<form method="POST" action="{{ url_for('delete_review', review_id=review.get_review_id()) }}">
+    <button type="submit" onclick="return confirm('Are you sure you want to delete this review?')">Delete Review</button>
+</form>
+
+{% else %}
+<p>No review found or you do not have permission to edit it.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var reviewDate = document.querySelector("input[name='date']");
+        if (reviewDate && !reviewDate.value) {
+            reviewDate.value = new Date().toISOString().split('T')[0];
+        }
+    });
+
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let ratingSelected = document.querySelector("input[name='rating']");
+        if (!ratingSelected || ratingSelected.value < 1 || ratingSelected.value > 5) {
+            alert("Please select a valid rating between 1 and 5.");
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    font-size: 30px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.star-rating input[type="radio"] {
+  display: none;
+}
+
+.star-rating label {
+  color: #ccc;
+  transition: color 0.3s ease-in-out;
+}
+
+.star-rating input[type="radio"]:checked ~ label {
+  color: gold;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: gold;
+}
+</style>
+{% endblock %}
